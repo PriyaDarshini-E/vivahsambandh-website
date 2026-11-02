@@ -13,12 +13,16 @@
       } catch (e) { /* storage unavailable — default lang="en" stands */ }
     </script>
     <meta name="google" content="notranslate" >
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" >
+    <meta name="google-site-verification" content="oIRTPNzd-n2TMxyb0fUwvfM0mD8otNhfpNi-3PpJ98k" >
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" >
     <link rel="preconnect" href="https://fonts.googleapis.com" >
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin >
     <link rel="preconnect" href="https://vivahsambandh.com" crossorigin >
-    <!-- LCP banner: preload with responsive candidates so the hero paints fast -->
+    <!-- LCP banner: preload with responsive candidates so the hero paints fast.
+         1440w added: desktop (1350px viewport) was jumping from 1280w to 2172w (110KB).
+         Now picks 1440w (~70KB) instead. Per perf.md Phase 7 desktop gap fix. -->
     <link
       rel="preload"
       as="image"
@@ -49,7 +53,7 @@
          prerender plugin inserts the prerendered body at the START of
          #root — anything inside would be duplicated below the real content.
          main.tsx removes it as soon as the app takes over. -->
-    <div id="app-boot" aria-hidden="true">
+    <div id="app-boot" class="app-boot" aria-hidden="true">
       <div class="app-boot__hero">
         <div class="app-boot__line app-boot__line--eyebrow"></div>
         <div class="app-boot__line app-boot__line--title"></div>

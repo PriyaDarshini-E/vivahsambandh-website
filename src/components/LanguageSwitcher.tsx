@@ -101,7 +101,13 @@ export default function LanguageSwitcher({ compact = false }: { compact?: boolea
                 : 'text-navy-900/70 hover:bg-gold-100 hover:text-navy-900'
             }${isPending ? ' animate-pulse' : ''}`}
           >
-            {lng === 'en' ? t('lang.en') : t('lang.hi')}
+            {lng === 'en' ? (
+              t('lang.en')
+            ) : (
+              <span style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+                {t('lang.hi')}
+              </span>
+            )}
           </button>
         )
       })}

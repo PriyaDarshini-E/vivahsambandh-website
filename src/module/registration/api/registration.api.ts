@@ -117,6 +117,32 @@ export async function createUserRegister(
   )
 }
 
+export interface CreateUserPaymentParams {
+  user_id: string | number
+  payment_method: string
+  payment_details: string
+  payment_status: string
+}
+
+/**
+ * Submits payment details for a registered user to CRM create-user-payment endpoint.
+ */
+export async function createUserPayment(
+  payload: CreateUserPaymentParams,
+): Promise<{ success: boolean; message: string; data?: unknown }> {
+  const formData = new FormData()
+  formData.append('user_id', String(payload.user_id))
+  formData.append('payment_method', payload.payment_method)
+  formData.append('payment_details', payload.payment_details)
+  formData.append('payment_status', payload.payment_status)
+
+  return postRegistrationForm(
+    '/create-user-payment',
+    formData,
+    'Payment submitted successfully!',
+  )
+}
+
 /**
  * Submits the admin registration form (name, gender, email, address, city,
  * mobile, face image) to the CRM create-admin-register endpoint.

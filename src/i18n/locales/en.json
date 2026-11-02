@@ -1296,6 +1296,27 @@
       "stepThankYou": "Thank You",
       "thankYouTitle": "Thank You!",
       "thankYouBody": "Your bio-data registration has been submitted successfully. Our committee will review your profile within 24 to 48 hours."
+    },
+    "payment": {
+      "title": "Registration Successful — Complete Payment",
+      "subtitle": "Your registration details have been submitted. Please scan the QR code to complete the fee payment.",
+      "successSubtitle": "Your registration and payment verification request have been received! Our committee will review your profile.",
+      "submittedHeader": "Payment Details Submitted",
+      "submittedText": "Your payment status is currently Pending verification. Once verified by our administration team, your profile will become active.",
+      "userRefId": "User Reference ID",
+      "regFee": "Registration Fee",
+      "specialOffer": "Special Offer",
+      "scanUpiHint": "Scan using Google Pay, PhonePe, Paytm, or any BHIM UPI application",
+      "utrLabel": "Enter Transaction ID / UTR Number",
+      "utrPlaceholder": "e.g. 3241XXXXXXXX or UPI Reference No.",
+      "utrHelpText": "You can find the 12-digit UTR or Transaction ID in your UPI payment receipt.",
+      "utrRequired": "Please enter your Transaction ID or UTR number.",
+      "utrMinLength": "Please enter a valid Transaction ID / UTR number (at least 6 characters).",
+      "submitButton": "Submit Payment Details",
+      "submittingButton": "Submitting Details...",
+      "skipButton": "Skip for now or submit another response",
+      "errorFailed": "Failed to submit payment details. Please try again.",
+      "errorUnknown": "An error occurred while submitting payment details."
     }
   },
   "notFound": {

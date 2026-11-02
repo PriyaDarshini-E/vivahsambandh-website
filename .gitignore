@@ -38,3 +38,5 @@ dist-ssr
 .figma/
 .notion/
 .playwright-cli
+
+lighthouse-reports

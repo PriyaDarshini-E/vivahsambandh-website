@@ -23,6 +23,7 @@ import ContactPage from "./module/contact/pages/ContactPage";
 import RegistrationPage from "./module/registration/pages/RegistrationPage";
 import AdminRegisterPage from "./module/registration/pages/AdminRegisterPage";
 import DownloadPage from "./module/download/pages/DownloadPage";
+import AppRedirectPage from "./module/download/pages/AppRedirectPage";
 import NotFoundPage from "./module/not-found/pages/NotFoundPage";
 import { QueryProvider } from "./lib/api/queryClient";
 import type { AppLang } from "./i18n";
@@ -125,6 +126,8 @@ export default function AppServer() {
                 <Route path="/hi/contact" element={<ContactPage />} />
                 <Route path="/download" element={<DownloadPage />} />
                 <Route path="/hi/download" element={<DownloadPage />} />
+                <Route path="/app" element={<AppRedirectPage />} />
+                <Route path="/hi/app" element={<AppRedirectPage />} />
                 <Route path="/registration" element={<RegistrationPage />} />
                 <Route path="/hi/registration" element={<RegistrationPage />} />
                 <Route path="/register" element={<RegistrationPage />} />

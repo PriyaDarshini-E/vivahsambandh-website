@@ -516,7 +516,7 @@ export default defineConfig({
     },
   },
   build: {
-    minify: true,
+    minify: 'esbuild',
     cssMinify: true,
     assetsInlineLimit: 4096,
     chunkSizeWarningLimit: 500,
@@ -545,6 +545,10 @@ export default defineConfig({
           if (/\/node_modules\/(react|react-dom|scheduler|react-is)\//.test(p)) return 'react';
           if (/gsap/.test(p)) return 'gsap';
           if (/\/lenis\//.test(p)) return 'lenis';
+          // motion/framer-motion → separate chunk so it never loads on first paint
+          if (/motion|framer-motion/.test(p)) return 'motion';
+          // lucide-react + Radix UI primitives → ui-vendor chunk (tree-shaken by rollup)
+          if (/lucide-react|@radix-ui|radix-ui/.test(p)) return 'ui-vendor';
           if (/swiper/.test(p)) return 'swiper';
           if (/dompurify/.test(p)) return 'dompurify';
           if (/@tanstack/.test(p)) return 'tanstack';

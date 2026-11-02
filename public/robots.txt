@@ -1,4 +1,13 @@
 User-agent: *
 Allow: /
 
+# Private & Admin Endpoints
+Disallow: /admin
+Disallow: /admin/
+Disallow: /super-admin
+Disallow: /super-admin/
+Disallow: /api/
+Disallow: /crmapi/
+
+# Sitemap Reference
 Sitemap: https://vivahsambandh.com/sitemap.xml

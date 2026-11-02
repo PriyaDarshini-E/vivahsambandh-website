@@ -120,6 +120,8 @@ export interface RegistrationFormContextValue {
   isSubmitting: boolean
   submitResult: { type: 'success' | 'error'; message: string } | null
   resetRegistration: () => void
+  registeredUserId: string | number | null
+  setRegisteredUserId: React.Dispatch<React.SetStateAction<string | number | null>>
 
   // OTP modal control
   isOtpModalOpen: boolean
@@ -201,6 +203,7 @@ export function RegistrationFormProvider({ children }: PropsWithChildren) {
     type: 'success' | 'error'
     message: string
   } | null>(null)
+  const [registeredUserId, setRegisteredUserId] = useState<string | number | null>(null)
 
   // Load initial dropdowns
   useEffect(() => {
@@ -667,6 +670,7 @@ function convertTo24HourTime(timeStr: string): string {
     // (fields not in the spec must not be sent), empty strings allowed for
     // optional keys as per the reference request.
     const formData = new FormData()
+    formData.append('register_type', 'Website')
     formData.append('name', form.name.trim())
     formData.append('gender', form.gender)
     formData.append('date_of_birth', form.date_of_birth)
@@ -717,6 +721,15 @@ function convertTo24HourTime(timeStr: string): string {
     try {
       const res = await createUserRegister(formData)
       if (res.success) {
+        // Extract user_id from various common CRM response patterns
+        const payloadData = res.data as Record<string, unknown> | null | undefined
+        const nestedData = payloadData?.data as Record<string, unknown> | null | undefined
+        const extractedUserId = (nestedData?.id ?? nestedData?.user_id ?? payloadData?.id ?? payloadData?.user_id ?? '') as string | number
+
+        if (extractedUserId) {
+          setRegisteredUserId(extractedUserId)
+        }
+
         setSubmitResult({
           type: 'success',
           message:
@@ -835,6 +848,7 @@ function convertTo24HourTime(timeStr: string): string {
     setIsMobileVerified(false)
     setVerifiedMobileNumber('')
     setSubmitResult(null)
+    setRegisteredUserId(null)
     setCurrentStep(0)
     otpTriggerSourceRef.current = 'inline'
     setOtpTriggerSource('inline')
@@ -875,6 +889,8 @@ function convertTo24HourTime(timeStr: string): string {
     isSubmitting,
     submitResult,
     resetRegistration,
+    registeredUserId,
+    setRegisteredUserId,
     isOtpModalOpen,
     setIsOtpModalOpen,
     otpTriggerSource,

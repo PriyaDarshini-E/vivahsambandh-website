@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next'
-import { COMPANY } from '../constants/company'
+import { useCompanyDetails } from '../module/company'
 import { img } from '../lib/image'
 
 export type StoreKind = 'play' | 'apple'
 
 const STORES = {
   play: {
-    href: COMPANY.apps.playStore,
     captionKey: 'app.getItOn',
     name: 'Google Play',
     labelKey: 'app.googlePlay',
@@ -14,7 +13,6 @@ const STORES = {
     alt: 'Get it on Google Play',
   },
   apple: {
-    href: COMPANY.apps.appStore,
     captionKey: 'app.downloadOn',
     name: 'App Store',
     labelKey: 'app.appStore',
@@ -34,7 +32,9 @@ interface StoreBadgeProps {
  */
 export default function StoreBadge({ store, className = '' }: StoreBadgeProps) {
   const { t } = useTranslation()
-  const { href, captionKey, name, labelKey, image, alt } = STORES[store]
+  const company = useCompanyDetails()
+  const { captionKey, name, labelKey, image, alt } = STORES[store]
+  const href = store === 'play' ? company.apps.playStore : company.apps.appStore
 
   return (
     <a

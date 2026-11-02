@@ -38,6 +38,18 @@ export function useCompanyDetails(lang?: string) {
     ? (resolveImageUrl(live.company_logo, data?.image_url, 'Company') ?? undefined)
     : undefined
 
+  const socials = {
+    facebook: live?.company_facebook?.trim() || COMPANY.socials.facebook,
+    instagram: live?.company_instagram?.trim() || COMPANY.socials.instagram,
+    linkedin: live?.company_linkedin?.trim() || COMPANY.socials.linkedin,
+    youtube: live?.company_youtube?.trim() || COMPANY.socials.youtube,
+  }
+
+  const apps = {
+    playStore: live?.company_play_store?.trim() || COMPANY.apps.playStore,
+    appStore: live?.company_app_store?.trim() || COMPANY.apps.appStore,
+  }
+
   return {
     phone,
     phoneLink,
@@ -47,6 +59,8 @@ export function useCompanyDetails(lang?: string) {
     address,
     name,
     logoUrl,
+    socials,
+    apps,
     raw: live,
     isPending,
     isError,

@@ -116,11 +116,9 @@ export default function Header() {
           title={company.name}
           className="flex min-w-0 items-center gap-4 transition hover:opacity-95"
         >
-          {company.logoUrl && (
-            <span className="flex shrink-0 items-center rounded-lg px-2 py-1.5">
-              <CompanyLogo className="h-8 w-auto sm:h-9" />
+          <span className="flex shrink-0 items-center rounded-lg px-2 py-1.5">
+              <CompanyLogo className="h-8 w-auto sm:h-9" width={154} height={38} />
             </span>
-          )}
           {/* <span className="min-w-0 leading-none">
             <span className="font-display block truncate text-base font-bold text-navy-900 sm:text-xl">
               {company.name}

@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
 import App from './App.tsx'
 import { SeoHost } from './seo/seo.tsx'
+import { initDeferredGTM } from './lib/gtm'
 
 /**
  * Shared client/server root tree.
@@ -15,6 +16,11 @@ export default function Root() {
   // prerender. The app shell is on screen by now, so the placeholder can go.
   useEffect(() => {
     document.getElementById('app-boot')?.remove()
+  }, [])
+
+  // Initialize GTM with non-blocking deferred loading
+  useEffect(() => {
+    return initDeferredGTM()
   }, [])
 
   return (

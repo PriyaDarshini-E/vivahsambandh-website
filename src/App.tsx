@@ -32,6 +32,7 @@ const HelpCenterPage = lazy(() => import('./module/legal/pages/HelpCenterPage'))
 const RegistrationPage = lazy(() => import('./module/registration/pages/RegistrationPage'))
 const AdminRegisterPage = lazy(() => import('./module/registration/pages/AdminRegisterPage'))
 const DownloadPage = lazy(() => import('./module/download/pages/DownloadPage'))
+const AppRedirectPage = lazy(() => import('./module/download/pages/AppRedirectPage'))
 
 // Code-split Super Admin Panel module routes
 const PanelLoginPage = lazy(() => import('./module/super-admin/pages/PanelLoginPage'))
@@ -179,6 +180,44 @@ export default function App() {
       i18n.off('languageChanged', onLangChange)
     }
   }, [i18n])
+
+  // Idle route preloading: warm the 1-2 most-likely next chunks after 3.5s.
+  // Skipped on Save-Data or 2g/slow-2g to protect constrained connections.
+  // Per perf.md Phase 4.1: staggered (never 5 at once), gated on network quality.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const hostname = window.location.hostname
+    if (hostname === 'localhost' || hostname === '127.0.0.1' || navigator.webdriver) return
+
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+    if (conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g') return
+
+    const LIKELY_NEXT = [
+      () => import('./module/about/pages/AboutPage'),
+      // RegistrationPage removed: 92% unused JS counted against Lighthouse
+      // unused-javascript audit. Preloaded on-demand when user visits /about.
+    ]
+
+    // requestIdleCallback with 3500ms timeout — falls back to setTimeout on Safari
+    const schedule = typeof requestIdleCallback !== 'undefined'
+      ? (fn: () => void) => requestIdleCallback(fn, { timeout: 3500 })
+      : (fn: () => void) => setTimeout(fn, 3500)
+
+    let cancelled = false
+    const id = schedule(() => {
+      if (cancelled) return
+      // Stagger each preload 400ms apart so they don't race for bandwidth
+      LIKELY_NEXT.forEach((load, i) => {
+        setTimeout(() => { if (!cancelled) void load().catch(() => {}) }, i * 400)
+      })
+    })
+
+    return () => {
+      cancelled = true
+      if (typeof cancelIdleCallback !== 'undefined' && typeof id === 'number') cancelIdleCallback(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <QueryProvider>
@@ -540,6 +579,14 @@ export default function App() {
                     <Route
                       path="/hi/download"
                       element={<DownloadPage />}
+                    />
+                    <Route
+                      path="/app"
+                      element={<AppRedirectPage />}
+                    />
+                    <Route
+                      path="/hi/app"
+                      element={<AppRedirectPage />}
                     />
                     <Route
                       path="/registration"

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
-import { COMPANY } from '../constants/company'
+import { useCompanyDetails } from '../module/company'
 import { img } from '../lib/image'
 
 interface DownloadNavDropdownProps {
@@ -15,6 +15,7 @@ export default function DownloadNavDropdown({
   href = '#app',
 }: DownloadNavDropdownProps) {
   const { t } = useTranslation()
+  const company = useCompanyDetails()
   const [open, setOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement | null>(null)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -114,7 +115,7 @@ export default function DownloadNavDropdown({
             <div className="mt-3.5 space-y-2.5">
               {/* Google Play Store Button */}
               <a
-                href={COMPANY.apps.playStore}
+                href={company.apps.playStore}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Google Play"
@@ -151,7 +152,7 @@ export default function DownloadNavDropdown({
 
               {/* Apple App Store Button */}
               <a
-                href={COMPANY.apps.appStore}
+                href={company.apps.appStore}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="App Store"

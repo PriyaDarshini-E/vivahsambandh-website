@@ -12,6 +12,9 @@ Options -Indexes
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
+  # 1. Never serve sitemap.xml with a trailing slash (Prevents Google Search Console "Couldn't fetch" error)
+  RewriteRule ^sitemap\.xml/$ /sitemap.xml [R=301,L,NC]
+
   # Prefer Brotli when the client accepts it and a .br twin exists.
   RewriteCond %{HTTP:Accept-Encoding} br
   RewriteCond %{REQUEST_FILENAME}.br -f
