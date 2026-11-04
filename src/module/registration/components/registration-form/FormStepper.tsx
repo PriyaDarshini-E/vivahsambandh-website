@@ -68,10 +68,7 @@ export default function FormStepper({ current, onSelect }: FormStepperProps) {
 
       {/* ——— Classic desktop stepper ——— */}
       <div className="hidden px-6 py-7 sm:block lg:px-12">
-        <ol
-          className="relative grid"
-          style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
-        >
+        <div className="relative">
           {/* rail */}
           <span
             aria-hidden="true"
@@ -84,46 +81,51 @@ export default function FormStepper({ current, onSelect }: FormStepperProps) {
             style={{ left: `${railInset}%`, width: `${fillPercent}%` }}
           />
 
-          {REGISTRATION_STEPS.map((step, index) => {
-            const state = index < current ? 'done' : index === current ? 'current' : 'todo'
-            return (
-              <li key={step.id} className="relative flex flex-col items-center">
-                <button
-                  type="button"
-                  onClick={() => onSelect(index)}
-                  aria-current={state === 'current' ? 'step' : undefined}
-                  className={cn(
-                    'step-node group relative z-10 grid size-11 place-items-center rounded-full border-2 text-sm font-bold transition-colors duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-100',
-                    state === 'done' &&
-                      'border-navy-900 bg-navy-900 text-white hover:bg-navy-800 hover:border-navy-800',
-                    state === 'current' &&
-                      'scale-105 border-gold-600 bg-gold-500 text-white',
-                    state === 'todo' &&
-                      'border-cream-400 bg-white text-ink-500 hover:border-gold-400 hover:text-gold-700',
-                  )}
-                >
-                  {state === 'current' && <span aria-hidden="true" className="step-halo" />}
-                  {state === 'done' ? (
-                    <Check className="size-5" strokeWidth={3} aria-hidden="true" />
-                  ) : (
-                    <span aria-hidden="true">{step.number}</span>
-                  )}
-                </button>
+          <ol
+            className="relative grid"
+            style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
+          >
+            {REGISTRATION_STEPS.map((step, index) => {
+              const state = index < current ? 'done' : index === current ? 'current' : 'todo'
+              return (
+                <li key={step.id} className="relative flex flex-col items-center">
+                  <button
+                    type="button"
+                    onClick={() => onSelect(index)}
+                    aria-current={state === 'current' ? 'step' : undefined}
+                    className={cn(
+                      'step-node group relative z-10 grid size-11 place-items-center rounded-full border-2 text-sm font-bold transition-colors duration-300 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-cream-100',
+                      state === 'done' &&
+                        'border-navy-900 bg-navy-900 text-white hover:bg-navy-800 hover:border-navy-800',
+                      state === 'current' &&
+                        'scale-105 border-gold-600 bg-gold-500 text-white',
+                      state === 'todo' &&
+                        'border-cream-400 bg-white text-ink-500 hover:border-gold-400 hover:text-gold-700',
+                    )}
+                  >
+                    {state === 'current' && <span aria-hidden="true" className="step-halo" />}
+                    {state === 'done' ? (
+                      <Check className="size-5" strokeWidth={3} aria-hidden="true" />
+                    ) : (
+                      <span aria-hidden="true">{step.number}</span>
+                    )}
+                  </button>
 
-                <span
-                  className={cn(
-                    'mt-3 text-center text-[13px] transition-colors duration-300',
-                    state === 'done' && 'font-semibold text-navy-800',
-                    state === 'current' && 'font-bold text-navy-900',
-                    state === 'todo' && 'font-medium text-ink-500',
-                  )}
-                >
-                  {t(step.shortLabelKey, step.shortLabelFallback)}
-                </span>
-              </li>
-            )
-          })}
-        </ol>
+                  <span
+                    className={cn(
+                      'mt-3 text-center text-[13px] transition-colors duration-300',
+                      state === 'done' && 'font-semibold text-navy-800',
+                      state === 'current' && 'font-bold text-navy-900',
+                      state === 'todo' && 'font-medium text-ink-500',
+                    )}
+                  >
+                    {t(step.shortLabelKey, step.shortLabelFallback)}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
       </div>
     </div>
   )

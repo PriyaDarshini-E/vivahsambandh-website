@@ -77,10 +77,10 @@ export default function InfoCards() {
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-500 text-white shadow-gold">
                 <CardIcon index={i} />
               </span>
-              <span className="min-w-0">
-                <span className="font-display block text-[15px] sm:text-base font-bold text-navy-900">
+              <div className="min-w-0">
+                <h2 className="font-display block text-[15px] sm:text-base font-bold text-navy-900">
                   {card.title}
-                </span>
+                </h2>
                 {card.href ? (
                   <a
                     href={card.href}
@@ -97,7 +97,7 @@ export default function InfoCards() {
                 {card.note && (
                   <span className="mt-0.5 block text-[11px] sm:text-xs text-ink-500">{card.note}</span>
                 )}
-              </span>
+              </div>
             </article>
           ))}
         </RevealGroup>

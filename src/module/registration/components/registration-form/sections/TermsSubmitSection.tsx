@@ -52,11 +52,10 @@ export default function TermsSubmitSection() {
             className="mt-0.5 size-5"
             aria-label={t('registrationPage.form.termsAndConditions', 'Agree to Terms and Conditions')}
           />
-          <label
-            htmlFor={`${baseId}-agree-terms`}
-            className="cursor-pointer text-[13px] leading-relaxed text-navy-900 sm:text-sm"
-          >
-            {t('registrationPage.form.agreeTermsPrefix', 'I have read, understood and agree to the')}{' '}
+          <div className="text-[13px] leading-relaxed text-navy-900 sm:text-sm">
+            <label htmlFor={`${baseId}-agree-terms`} className="cursor-pointer">
+              {t('registrationPage.form.agreeTermsPrefix', 'I have read, understood and agree to the')}
+            </label>{' '}
             <button
               type="button"
               onClick={() => setTermsOpen(true)}
@@ -64,8 +63,10 @@ export default function TermsSubmitSection() {
             >
               {t('registrationPage.form.termsAndConditions', 'Terms & Conditions')}
             </button>{' '}
-            {t('registrationPage.form.agreeTermsSuffix', 'governing community bio-data verification and honorary matchmaking support.')}
-          </label>
+            <label htmlFor={`${baseId}-agree-terms`} className="cursor-pointer">
+              {t('registrationPage.form.agreeTermsSuffix', 'governing community bio-data verification and honorary matchmaking support.')}
+            </label>
+          </div>
         </div>
         {fieldErrors.agree_terms && (
           <p role="alert" className="mt-2 flex items-start gap-1.5 text-xs font-semibold text-maroon-600">

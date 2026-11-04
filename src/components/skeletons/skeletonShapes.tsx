@@ -108,9 +108,9 @@ function Band({
   children: React.ReactNode
 }) {
   return (
-    <section className={cn(className, spec.bg)}>
+    <div className={cn(className, spec.bg)}>
       {children}
-    </section>
+    </div>
   )
 }
 

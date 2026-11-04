@@ -47,11 +47,11 @@ export default function AdminRegisterPage() {
       </section>
 
       {/* Main Admin Registration Form Section */}
-      <section className="relative -mt-8 pb-20 sm:pb-28">
+      <div className="relative -mt-8 pb-20 sm:pb-28">
         <div className="section-pad">
           <AdminRegisterForm />
         </div>
-      </section>
+      </div>
     </div>
   )
 }

@@ -97,7 +97,7 @@ export default function BlogsPage() {
 
       {/* Category filter */}
       {categories.length > 0 ? (
-        <section className="section-pad relative z-10 pt-8">
+        <div className="section-pad relative z-10 pt-8">
           <div
             role="group"
             aria-label={t('blogsPage.categoryFilter', 'Filter articles by category')}
@@ -138,11 +138,12 @@ export default function BlogsPage() {
               )
             })}
           </div>
-        </section>
+        </div>
       ) : null}
 
       {/* Listing */}
       <section className="section-pad relative z-10 py-10 sm:py-14">
+        <h2 className="sr-only">{t('blogsPage.listingTitle', 'Articles')}</h2>
         {isPending ? (
           <ListingSkeleton />
         ) : isError ? (
