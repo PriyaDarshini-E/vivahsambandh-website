@@ -35,7 +35,7 @@ export default function MissionVision() {
   ]
 
   return (
-    <section className="relative isolate overflow-hidden bg-cream-50 pb-12 sm:pb-16 lg:pb-20 pt-2">
+    <div className="relative isolate overflow-hidden bg-cream-50 pb-12 sm:pb-16 lg:pb-20 pt-2">
       <div className="section-pad relative z-10">
         <RevealGroup className="grid gap-5 sm:gap-6 lg:grid-cols-2 lg:gap-8" stagger={0.12}>
           {cards.map((card) => (
@@ -61,6 +61,6 @@ export default function MissionVision() {
           ))}
         </RevealGroup>
       </div>
-    </section>
+    </div>
   )
 }

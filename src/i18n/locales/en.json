@@ -372,6 +372,7 @@
     "titleA": "All",
     "titleB": "Stories & Articles.",
     "subtitle": "Browse every article, guide and community update from Vivah Sambandh.",
+    "listingTitle": "Articles",
     "retry": "Try again",
     "loadErrorTitle": "Could not load blogs",
     "loadErrorDesc": "Something went wrong while fetching articles. Please try again.",

@@ -517,11 +517,10 @@ export default function AdminRegisterForm() {
                   className="mt-0.5 size-5"
                   aria-label="Agree to Terms and Conditions"
                 />
-                <label
-                  htmlFor={`${inputId}-agree-terms`}
-                  className="cursor-pointer text-[13px] leading-relaxed text-navy-900 sm:text-sm"
-                >
-                  I have read, understood and agree to the{' '}
+                <div className="text-[13px] leading-relaxed text-navy-900 sm:text-sm">
+                  <label htmlFor={`${inputId}-agree-terms`} className="cursor-pointer">
+                    I have read, understood and agree to the
+                  </label>{' '}
                   <button
                     type="button"
                     onClick={() => setTermsOpen(true)}
@@ -529,8 +528,10 @@ export default function AdminRegisterForm() {
                   >
                     Terms &amp; Conditions
                   </button>{' '}
-                  governing community bio-data verification and honorary matchmaking support.
-                </label>
+                  <label htmlFor={`${inputId}-agree-terms`} className="cursor-pointer">
+                    governing community bio-data verification and honorary matchmaking support.
+                  </label>
+                </div>
               </div>
               {fieldErrors.agree_terms && (
                 <p

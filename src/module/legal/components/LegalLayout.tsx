@@ -54,7 +54,7 @@ export default function LegalLayout({ eyebrow, title, updated, intro, sections }
       </section>
 
       {/* Content card */}
-      <section className="section-pad relative z-10 py-10 sm:py-14">
+      <div className="section-pad relative z-10 py-10 sm:py-14">
         <Reveal variant="up" className="mx-auto max-w-3xl">
           <div className="rounded-2xl border border-[#EADDC3] bg-white p-6 shadow-[0_2px_10px_rgba(16,24,40,0.06)] sm:p-10">
             {sections.map((s, i) => (
@@ -82,7 +82,7 @@ export default function LegalLayout({ eyebrow, title, updated, intro, sections }
             </div>
           </div>
         </Reveal>
-      </section>
+      </div>
     </div>
   )
 }

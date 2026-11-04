@@ -52,20 +52,22 @@ export default function StatsStrip() {
           <dl className="grid grid-cols-2 gap-x-4 gap-y-7 lg:grid-cols-4">
             {stats.map((s, i) => (
               <div key={`${s.value}-${s.label}`} className="relative flex flex-col items-center text-center">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-500/12 text-gold-600">
-                  <StatIcon index={i} />
-                </span>
                 <dt className="sr-only">{s.label}</dt>
-                <dd className="font-display mt-2 text-xl sm:text-2xl font-bold text-navy-900">{s.value}</dd>
-                <dd className="text-[11px] sm:text-xs font-semibold tracking-wide text-ink-500">{s.label}</dd>
-                {i < stats.length - 1 && (
-                  <span
-                    aria-hidden="true"
-                    className="absolute top-1/2 -right-2 hidden -translate-y-1/2 text-[9px] text-gold-500 lg:block"
-                  >
-                    ◆
+                <dd className="flex flex-col items-center">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-500/12 text-gold-600">
+                    <StatIcon index={i} />
                   </span>
-                )}
+                  <span className="font-display mt-2 text-xl sm:text-2xl font-bold text-navy-900">{s.value}</span>
+                  <span className="text-[11px] sm:text-xs font-semibold tracking-wide text-ink-500">{s.label}</span>
+                  {i < stats.length - 1 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute top-1/2 -right-2 hidden -translate-y-1/2 text-[9px] text-gold-500 lg:block"
+                    >
+                      ◆
+                    </span>
+                  )}
+                </dd>
               </div>
             ))}
           </dl>
