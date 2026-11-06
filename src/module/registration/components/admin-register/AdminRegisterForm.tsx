@@ -7,20 +7,21 @@
  * validators and shadcn-style UI primitives from the main registration form.
  */
 
-import { useId, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field } from '@/components/ui/field'
 import { Checkbox } from '@/components/ui/checkbox'
 import { OptionPills } from '@/components/ui/option-pills'
+import { FormSelect } from '@/components/ui/form-select'
 import { cn } from 'cn'
-import { createAdminRegister } from '../../api/registration.api'
+import { createAdminRegister, getStates } from '../../api/registration.api'
 import MobileNumberField from '../MobileNumberField'
 import PhotoCropField from '../PhotoCropField'
 import TermsModal from '../TermsModal'
 import OtpVerificationModal from '../OtpVerificationModal'
-import type { AdminRegisterFormData } from '../../types'
+import type { AdminRegisterFormData, StateItem } from '../../types'
 import {
   sanitizeName,
   sanitizeEmail,
@@ -42,6 +43,11 @@ const initialAdminFormState: AdminRegisterFormData = {
   user_address: '',
   user_current_city: '',
   mobile: '',
+  alternate_mobile_no: '',
+  admin_state: '',
+  admin_document_type: '',
+  admin_document: null,
+  admin_document_preview: '',
   face_image: null,
   face_image_preview: '',
   agree_terms: false,
@@ -56,6 +62,7 @@ interface SubmitResult {
 
 export default function AdminRegisterForm() {
   const inputId = useId()
+  const documentInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState<AdminRegisterFormData>(initialAdminFormState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,9 +72,32 @@ export default function AdminRegisterForm() {
   const [otpMode, setOtpMode] = useState<'inline' | 'submit'>('submit')
   const [isMobileVerified, setIsMobileVerified] = useState(false)
   const [verifiedMobileNumber, setVerifiedMobileNumber] = useState('')
+  const [states, setStates] = useState<StateItem[]>([])
+  const [statesLoading, setStatesLoading] = useState(false)
 
   const isMobileVerifiedNow =
     isMobileVerified && form.mobile === verifiedMobileNumber
+
+  // Load states dropdown
+  useEffect(() => {
+    let active = true
+    setStatesLoading(true)
+    getStates()
+      .then((list) => {
+        if (!active) return
+        setStates(list)
+      })
+      .catch((err) => {
+        console.error('Failed to load states:', err)
+      })
+      .finally(() => {
+        if (!active) return
+        setStatesLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   const clearFieldError = (key: keyof AdminRegisterFormData) => {
     setFieldErrors((prev) => {
@@ -128,6 +158,44 @@ export default function AdminRegisterForm() {
     setForm((prev) => ({ ...prev, gender: value as AdminRegisterFormData['gender'] }))
   }
 
+  const handleStateChange = (value: string) => {
+    clearFieldError('admin_state')
+    setForm((prev) => ({ ...prev, admin_state: value }))
+  }
+
+  const handleDocumentTypeChange = (value: string) => {
+    clearFieldError('admin_document_type')
+    setForm((prev) => ({ ...prev, admin_document_type: value }))
+  }
+
+  const handleDocumentChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    clearFieldError('admin_document')
+    if (!file) return
+
+    // Revoke previous blob URL if exists before processing the new file
+    if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'application/pdf',
+    ]
+    if (!allowedTypes.includes(file.type)) {
+      setForm((prev) => ({ ...prev, admin_document: null, admin_document_preview: '' }))
+      e.target.value = ''
+      return
+    }
+    const previewUrl = URL.createObjectURL(file)
+    setForm((prev) => ({
+      ...prev,
+      admin_document: file,
+      admin_document_preview: previewUrl,
+    }))
+  }
+
   const handleCropComplete = (croppedFile: File, previewUrl: string) => {
     setForm((prev) => ({
       ...prev,
@@ -145,6 +213,7 @@ export default function AdminRegisterForm() {
     setOtpMode('submit')
     setIsMobileVerified(false)
     setVerifiedMobileNumber('')
+    if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
   }
 
   const validateForm = (): FieldErrors => {
@@ -167,6 +236,17 @@ export default function AdminRegisterForm() {
     const mobileResult = validateIndianMobile(form.mobile)
     if (!mobileResult.valid) errors.mobile = mobileResult.error
 
+    if (form.alternate_mobile_no) {
+      const altMobileResult = validateIndianMobile(form.alternate_mobile_no)
+      if (!altMobileResult.valid) errors.alternate_mobile_no = altMobileResult.error
+    }
+
+    if (!form.admin_state) errors.admin_state = 'Please select a state'
+
+    if (!form.admin_document_type) errors.admin_document_type = 'Please select a document type'
+
+    if (!form.admin_document) errors.admin_document = 'Please upload an ID document'
+
     if (!form.face_image) errors.face_image = 'Please upload a face photograph'
 
     if (!form.agree_terms) {
@@ -180,8 +260,10 @@ export default function AdminRegisterForm() {
   const submitRegistration = async () => {
     setIsSubmitting(true)
 
-    // FormData matching the create-admin-register API spec exactly:
-    // name, gender, email, user_address, user_current_city, mobile, face_image
+    // FormData matching the create-admin-register API spec:
+    // name, gender, email, user_address, user_current_city, mobile,
+    // alternate_mobile_no, admin_state, admin_document_type, admin_document,
+    // face_image
     const formData = new FormData()
     formData.append('name', form.name.trim())
     formData.append('gender', form.gender)
@@ -189,6 +271,14 @@ export default function AdminRegisterForm() {
     formData.append('user_address', form.user_address.trim())
     formData.append('user_current_city', form.user_current_city.trim())
     formData.append('mobile', form.mobile)
+    if (form.alternate_mobile_no) {
+      formData.append('alternate_mobile_no', form.alternate_mobile_no)
+    }
+    formData.append('admin_state', form.admin_state)
+    formData.append('admin_document_type', form.admin_document_type)
+    if (form.admin_document) {
+      formData.append('admin_document', form.admin_document)
+    }
     if (form.face_image) {
       formData.append('face_image', form.face_image)
     }
@@ -405,6 +495,39 @@ export default function AdminRegisterForm() {
             inputClassName={inputCls('mobile')}
           />
 
+          {/* Alternate Mobile Number */}
+          <Field
+            id={`${inputId}-alternate_mobile_no`}
+            label="Alternate Mobile Number"
+            error={fieldErrors.alternate_mobile_no}
+          >
+            <Input
+              id={`${inputId}-alternate_mobile_no`}
+              type="tel"
+              name="alternate_mobile_no"
+              inputMode="numeric"
+              maxLength={10}
+              value={form.alternate_mobile_no}
+              onChange={(e) => {
+                const sanitized = sanitizeDigits(e.target.value, 10)
+                clearFieldError('alternate_mobile_no')
+                setForm((prev) => ({ ...prev, alternate_mobile_no: sanitized }))
+              }}
+              onPaste={handlePasteCapture(
+                'alternate_mobile_no',
+                (val) => sanitizeDigits(val, 10),
+              )}
+              placeholder="Alternate 10-digit mobile"
+              className={inputCls('alternate_mobile_no')}
+              aria-invalid={Boolean(fieldErrors.alternate_mobile_no)}
+              aria-describedby={
+                fieldErrors.alternate_mobile_no
+                  ? `${inputId}-alternate_mobile_no-error`
+                  : undefined
+              }
+            />
+          </Field>
+
           {/* Email */}
           <Field
             id={`${inputId}-email`}
@@ -451,6 +574,31 @@ export default function AdminRegisterForm() {
             />
           </Field>
 
+          {/* Admin State */}
+          <Field
+            id={`${inputId}-admin_state`}
+            label="State"
+            required
+            error={fieldErrors.admin_state}
+          >
+            <FormSelect
+              id={`${inputId}-admin_state`}
+              value={form.admin_state}
+              onValueChange={handleStateChange}
+              options={states.map((s) => ({
+                value: String(s.id),
+                label: s.state_name,
+              }))}
+              placeholder="Select State"
+              loading={statesLoading}
+              error={Boolean(fieldErrors.admin_state)}
+              aria-invalid={Boolean(fieldErrors.admin_state)}
+              aria-describedby={
+                fieldErrors.admin_state ? `${inputId}-admin_state-error` : undefined
+              }
+            />
+          </Field>
+
           {/* Address */}
           <div className="sm:col-span-2">
             <Field
@@ -475,6 +623,96 @@ export default function AdminRegisterForm() {
                 }
               />
             </Field>
+          </div>
+
+          {/* Admin Document Type */}
+          <Field
+            id={`${inputId}-admin_document_type`}
+            label="ID Document Type"
+            required
+            error={fieldErrors.admin_document_type}
+          >
+            <FormSelect
+              id={`${inputId}-admin_document_type`}
+              value={form.admin_document_type}
+              onValueChange={handleDocumentTypeChange}
+              options={[
+                { value: 'Aadhar No', label: 'Aadhar No' },
+                { value: 'Driving License', label: 'Driving License' },
+                { value: 'Passport', label: 'Passport' },
+              ]}
+              placeholder="Select document type"
+              error={Boolean(fieldErrors.admin_document_type)}
+              aria-invalid={Boolean(fieldErrors.admin_document_type)}
+              aria-describedby={
+                fieldErrors.admin_document_type
+                  ? `${inputId}-admin_document_type-error`
+                  : undefined
+              }
+            />
+          </Field>
+
+          {/* Admin Document Upload */}
+          <div
+            id={`${inputId}-admin_document-group`}
+            className="flex flex-col rounded-2xl border p-5 transition"
+          >
+            <span className="text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
+              ID Document <span className="text-maroon-600" aria-hidden="true">*</span>
+            </span>
+            <p className="mt-1 text-xs leading-relaxed text-ink-500">
+              Upload Aadhar / Driving License / Passport (image or PDF)
+            </p>
+            <div className="mt-4 flex items-center gap-4">
+              {form.admin_document_preview ? (
+                <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-gold-500/50 bg-gold-50/30">
+                  <span className="text-sm text-navy-900 truncate max-w-[20rem]">
+                    {form.admin_document?.name ?? 'Document selected'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
+                      setForm((prev) => ({
+                        ...prev,
+                        admin_document: null,
+                        admin_document_preview: '',
+                      }))
+                      clearFieldError('admin_document')
+                    }}
+                    className="text-xs font-semibold text-maroon-600 hover:text-maroon-800"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <input
+                    ref={documentInputRef}
+                    id={`${inputId}-admin_document`}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.webp,.pdf"
+                    onChange={handleDocumentChange}
+                    className="sr-only"
+                    aria-label="ID Document"
+                  />
+                  <label
+                    htmlFor={`${inputId}-admin_document`}
+                    className="flex items-center justify-center gap-2 rounded-full border border-dashed border-gold-500/60 bg-white px-6 py-3 font-semibold text-navy-900 hover:border-gold-500 hover:bg-gold-50 transition cursor-pointer"
+                  >
+                    <span className="text-sm">Choose file</span>
+                  </label>
+                </>
+              )}
+              {fieldErrors.admin_document && (
+                <p
+                  role="alert"
+                  className="ml-1 flex items-start gap-1.5 text-xs font-semibold text-maroon-600"
+                >
+                  {fieldErrors.admin_document}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Face Photograph — same cropper as the user registration */}

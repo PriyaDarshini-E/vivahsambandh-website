@@ -33,6 +33,7 @@ interface FormSelectProps {
   searchPlaceholder?: string
   className?: string
   'aria-invalid'?: boolean
+  'aria-describedby'?: string
 }
 
 interface PopupPosition {
@@ -66,6 +67,7 @@ export function FormSelect({
   searchPlaceholder = 'Search...',
   className,
   'aria-invalid': ariaInvalid,
+  'aria-describedby': ariaDescribedBy,
 }: FormSelectProps) {
   const isDisabled = disabled || loading
   const needsSearch = searchable && options.length > 5 && !isDisabled
@@ -224,6 +226,7 @@ export function FormSelect({
           onChange={(event) => onValueChange(event.target.value)}
           disabled={isDisabled}
           aria-invalid={ariaInvalid ?? error}
+          aria-describedby={ariaDescribedBy}
           className={cn(
             'cursor-pointer appearance-none disabled:cursor-not-allowed disabled:opacity-60',
             fieldClasses(error),
@@ -265,6 +268,7 @@ export function FormSelect({
         aria-expanded={open}
         aria-controls={`${id}-listbox`}
         aria-invalid={ariaInvalid ?? error}
+        aria-describedby={ariaDescribedBy}
         disabled={isDisabled}
         onClick={() => (open ? close() : openPopup())}
         onKeyDown={(event) => {
