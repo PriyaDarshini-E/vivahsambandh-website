@@ -38,11 +38,13 @@ export function useCompanyDetails(lang?: string) {
     ? (resolveImageUrl(live.company_logo, data?.image_url, 'Company') ?? undefined)
     : undefined
 
+  // Social links are API-only. Missing fields stay null so consumers can
+  // conditionally render (e.g. hide YouTube when the API omits it).
   const socials = {
-    facebook: live?.company_facebook?.trim() || COMPANY.socials.facebook,
-    instagram: live?.company_instagram?.trim() || COMPANY.socials.instagram,
-    linkedin: live?.company_linkedin?.trim() || COMPANY.socials.linkedin,
-    youtube: live?.company_youtube?.trim() || COMPANY.socials.youtube,
+    facebook: live?.company_facebook?.trim() || null,
+    instagram: live?.company_instagram?.trim() || null,
+    linkedin: live?.company_linkedin?.trim() || null,
+    youtube: live?.company_youtube?.trim() || null,
   }
 
   const apps = {

@@ -45,13 +45,6 @@ export const COMPANY_CONFIG = {
   supportHours: COMPANY.supportHours,
   address: COMPANY.address,
 
-  socials: [
-    COMPANY.socials.facebook,
-    COMPANY.socials.instagram,
-    COMPANY.socials.youtube,
-    COMPANY.socials.linkedin,
-  ],
-
   community: COMPANY.community,
   priceRange: "₹₹",
 

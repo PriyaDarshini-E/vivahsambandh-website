@@ -1,7 +1,8 @@
 /**
  * Single source of truth for company / contact details.
  * Import from here everywhere instead of hardcoding phone, email,
- * address, social links or brand name in components / modules.
+ * address or brand name in components / modules. Social links are
+ * API-only (getCompany) and intentionally not defined here.
  *
  * Translated labels (e.g. "Call Us" / "कॉल करें") come from
  * `src/i18n/locales/*.json` — the canonical company values live here.
@@ -34,13 +35,6 @@ export const COMPANY = {
     membersCount: '50K+',
     verifiedBadge: '100% Privacy',
     establishedYear: 2024,
-  },
-
-  socials: {
-    facebook: 'https://www.facebook.com/profile.php?id=61595616586488/vivahsambandh',
-    instagram: 'https://www.instagram.com/vivahsambandh/?hl=en',
-    youtube: 'https://youtube.com/@vivahsambandh',
-    linkedin: 'https://www.linkedin.com/in/vivah-sambandh-a8b605447/',
   },
 
   apps: {

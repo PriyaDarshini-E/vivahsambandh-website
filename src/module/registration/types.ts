@@ -29,6 +29,11 @@ export interface ApiResponse<T> {
   message?: string
 }
 
+export interface StateItem {
+  id?: number | string
+  state_name: string
+}
+
 export interface AdminRegisterFormData {
   name: string
   gender: 'Male' | 'Female' | ''
@@ -36,6 +41,11 @@ export interface AdminRegisterFormData {
   user_address: string
   user_current_city: string
   mobile: string
+  alternate_mobile_no: string
+  admin_state: string
+  admin_document_type: string
+  admin_document: File | null
+  admin_document_preview: string
   face_image: File | null
   face_image_preview: string
   agree_terms: boolean

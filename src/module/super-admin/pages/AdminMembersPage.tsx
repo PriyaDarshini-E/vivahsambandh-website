@@ -10,9 +10,9 @@ import {
   RefreshCw,
   Edit2,
   Eye,
-  Mail,
   Phone,
   Smartphone,
+  FileText,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '../components/ConfirmDialog'
@@ -33,6 +33,7 @@ import { PanelFilterSelect } from '../components/PanelFilterSelect'
 import { ProfileAvatar } from '../components/ProfileAvatar'
 import { RowStatusSelect } from '../components/RowStatusSelect'
 import { CityAssignmentModal } from '../components/CityAssignmentModal'
+import { EditAdminModal } from '../components/EditAdminModal'
 import {
   useAdminMembersQuery,
   useRemoveDeviceIdMutation,
@@ -41,7 +42,7 @@ import {
 } from '../hook/useAdminMembers'
 import { errorMessage } from '../hook/errors'
 import { DEFAULT_PER_PAGE, useServerSearch } from '../hook/useServerList'
-import type { AdminMemberStatus } from '../types'
+import type { AdminMember, AdminMemberStatus } from '../types'
 
 const STATUS_FILTERS = ['All', 'Approved', 'Pending', 'Cancel'] as const
 
@@ -89,6 +90,9 @@ export default function AdminMembersPage() {
     id: number | string
     name: string
   } | null>(null)
+
+  // Edit Admin Modal State
+  const [editingAdmin, setEditingAdmin] = useState<AdminMember | null>(null)
 
   const editingCityAdmin = useMemo(
     () => allAdmins.find((a) => a.id === editingCityAdminId) ?? null,
@@ -256,12 +260,13 @@ export default function AdminMembersPage() {
           />
         ) : (
           <PanelTable
-            caption="Regional administrators with contact details, assigned cities and status"
+            caption="Regional administrators with contact details, verification info, assigned cities and status"
             head={
               <>
                 <PanelTableHeadCell>Admin Name</PanelTableHeadCell>
-                <PanelTableHeadCell>Contact</PanelTableHeadCell>
-                <PanelTableHeadCell>Current City</PanelTableHeadCell>
+                <PanelTableHeadCell>Alternate Mobile</PanelTableHeadCell>
+                <PanelTableHeadCell>State</PanelTableHeadCell>
+                <PanelTableHeadCell>ID Document Type</PanelTableHeadCell>
                 <PanelTableHeadCell>Assigned Cities</PanelTableHeadCell>
                 <PanelTableHeadCell>Status</PanelTableHeadCell>
                 <PanelTableHeadCell align="right">Actions</PanelTableHeadCell>
@@ -287,32 +292,35 @@ export default function AdminMembersPage() {
                       />
                       <div>
                         <p className="font-bold text-navy-900">{admin.name}</p>
-                        <p className="text-[0.68rem] text-ink-400">
-                          {admin.gender || 'Administrator'}
+                        <p className="flex items-center gap-1 text-[0.68rem] text-ink-400">
+                          <Phone className="size-2.5 text-ink-400" aria-hidden />
+                          {admin.mobile || '—'}
                         </p>
                       </div>
                     </div>
                   </td>
 
                   <td className="px-4 py-3.5">
-                    <div className="space-y-0.5">
-                      <p className="flex items-center gap-1.5 font-medium text-navy-900">
-                        <Phone className="size-3 text-ink-400" aria-hidden />
-                        {admin.mobile || '—'}
-                      </p>
-                      {admin.email && (
-                        <p className="flex items-center gap-1.5 text-ink-500">
-                          <Mail className="size-3 text-ink-400" aria-hidden />
-                          {admin.email}
-                        </p>
-                      )}
-                    </div>
+                    <span className="font-medium text-navy-900">
+                      {admin.alternate_mobile_no || '—'}
+                    </span>
                   </td>
 
                   <td className="px-4 py-3.5">
                     <span className="font-medium text-ink-700">
-                      {admin.user_current_city || '—'}
+                      {admin.admin_state || admin.user_current_city || '—'}
                     </span>
+                  </td>
+
+                  <td className="px-4 py-3.5">
+                    {admin.admin_document_type ? (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-navy-200 bg-navy-50/70 px-2 py-0.5 text-[0.68rem] font-semibold text-navy-800">
+                        <FileText className="size-3 text-navy-600" aria-hidden />
+                        {admin.admin_document_type}
+                      </span>
+                    ) : (
+                      <span className="text-[0.7rem] text-ink-400 italic">—</span>
+                    )}
                   </td>
 
                   <td className="px-4 py-3.5">
@@ -360,6 +368,18 @@ export default function AdminMembersPage() {
 
                   <td className="px-4 py-3.5">
                     <div className="flex items-center justify-end gap-1.5">
+                      <Button
+                        type="button"
+                        size="icon-xs"
+                        variant="outline"
+                        onClick={() => setEditingAdmin(admin)}
+                        title="Edit admin profile"
+                        aria-label="Edit admin profile"
+                        className="cursor-pointer rounded-full border-gold-300 bg-gold-50/70 text-gold-800 hover:bg-gold-100"
+                      >
+                        <Edit2 className="size-3.5 text-gold-700" aria-hidden />
+                      </Button>
+
                       <Button
                         type="button"
                         size="icon-xs"
@@ -457,6 +477,13 @@ export default function AdminMembersPage() {
           onClose={() => setRemoveDeviceTarget(null)}
         />
       )}
+      {/* Edit Admin Profile Modal */}
+      <EditAdminModal
+        isOpen={Boolean(editingAdmin)}
+        admin={editingAdmin}
+        onClose={() => setEditingAdmin(null)}
+        onSuccess={() => void refetch()}
+      />
     </div>
   )
 }

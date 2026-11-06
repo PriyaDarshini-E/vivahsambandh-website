@@ -273,11 +273,11 @@ export default function PersonalDetailsSection({
             options={[
               {
                 value: "Male",
-                label: t("registrationPage.form.genderMale", "Male"),
+                label: t("registrationPage.form.genderMale", "Mr"),
               },
               {
                 value: "Female",
-                label: t("registrationPage.form.genderFemale", "Female"),
+                label: t("registrationPage.form.genderFemale", "Miss"),
               },
             ]}
             error={Boolean(fieldErrors.gender)}

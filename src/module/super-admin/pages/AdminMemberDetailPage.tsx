@@ -7,9 +7,9 @@
  * the fields the list can only summarise in a row.
  */
 
+import { useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, UserRoundX } from 'lucide-react'
-import type { ReactNode } from 'react'
+import { ArrowLeft, Edit2, ExternalLink, FileText, UserRoundX } from 'lucide-react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { PanelCard } from '../components/PanelCard'
@@ -18,6 +18,7 @@ import { PanelEmpty, PanelError } from '../components/PanelState'
 import { Skeleton } from '../components/PanelSkeleton'
 import { RemoteImage } from '../components/RemoteImage'
 import { StatusBadge } from '../components/StatusBadge'
+import { EditAdminModal } from '../components/EditAdminModal'
 import { errorMessage, unwrapList } from '../hook/errors'
 import { PANEL_STALE_TIME, superAdminKeys } from '../hook/queryKeys'
 import { fetchAdminMembers, fetchPendingAdminMembers } from '../services/adminApi'
@@ -68,6 +69,8 @@ export default function AdminMemberDetailPage({
   const listPath = pending
     ? '/crm/pending-admin-members'
     : '/crm/admin-members'
+
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
   const { data: admin, isLoading, error, refetch } = useQuery({
     queryKey: [
@@ -165,6 +168,17 @@ export default function AdminMemberDetailPage({
         title={admin.name}
         description={summary}
         chip={<StatusBadge status={admin.status} />}
+        actions={
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => setIsEditModalOpen(true)}
+            className="cursor-pointer gap-1.5 rounded-full bg-gold-600 text-xs font-bold text-white hover:bg-gold-700"
+          >
+            <Edit2 className="size-3.5" aria-hidden />
+            <span>Edit Admin</span>
+          </Button>
+        }
       />
 
       <PanelCard>
@@ -202,16 +216,56 @@ export default function AdminMemberDetailPage({
 
             <section>
               <h4 className="mb-2 text-[0.7rem] font-bold tracking-[0.14em] text-gold-700 uppercase">
-                Contact Details
+                Contact & Location Details
               </h4>
               <DetailGrid
                 fields={[
-                  { label: 'Mobile', value: admin.mobile },
+                  { label: 'Primary Mobile', value: admin.mobile },
+                  { label: 'Alternate Mobile', value: admin.alternate_mobile_no },
                   { label: 'Email', value: admin.email },
                   { label: 'Current City', value: admin.user_current_city },
+                  { label: 'State', value: admin.admin_state },
                   { label: 'Full Address', value: admin.user_address },
                 ]}
               />
+            </section>
+
+            <section>
+              <h4 className="mb-2 text-[0.7rem] font-bold tracking-[0.14em] text-gold-700 uppercase">
+                Identity Verification
+              </h4>
+              <div className="rounded-2xl border border-cream-300/80 bg-cream-50/70 p-4 space-y-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  <div>
+                    <span className="block text-[0.68rem] text-ink-400">Document Type</span>
+                    <span className="font-semibold text-navy-900">
+                      {admin.admin_document_type || '—'}
+                    </span>
+                  </div>
+                  <div className="col-span-2">
+                    <span className="block text-[0.68rem] text-ink-400">Document File</span>
+                    {admin.admin_document ? (
+                      <div className="mt-1 flex items-center gap-3">
+                        <a
+                          href={admin.admin_document}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 rounded-lg border border-gold-300 bg-white px-3 py-1.5 text-xs font-semibold text-gold-800 shadow-xs hover:bg-gold-50"
+                        >
+                          <FileText className="size-4 text-gold-600" />
+                          <span>View Document</span>
+                          <ExternalLink className="size-3 text-ink-400" />
+                        </a>
+                        <span className="truncate text-[11px] text-ink-400">
+                          {admin.admin_document_name || 'Attached file'}
+                        </span>
+                      </div>
+                    ) : (
+                      <span className="font-medium text-ink-400 italic">No document on file</span>
+                    )}
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section>
@@ -238,6 +292,14 @@ export default function AdminMemberDetailPage({
           </div>
         </div>
       </PanelCard>
+
+      {/* Edit Admin Modal */}
+      <EditAdminModal
+        isOpen={isEditModalOpen}
+        admin={admin}
+        onClose={() => setIsEditModalOpen(false)}
+        onSuccess={() => refetch()}
+      />
     </div>
   )
 }

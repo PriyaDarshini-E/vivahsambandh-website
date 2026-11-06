@@ -184,6 +184,50 @@ export async function fetchPendingAdminMembers(
   return { data: [], error: res.message }
 }
 
+export async function updateAdminMember(
+  id: number | string,
+  payload: Record<string, unknown> | FormData,
+): Promise<{ success: boolean; message: string }> {
+  const isFormData = typeof FormData !== 'undefined' && payload instanceof FormData
+
+  let options: RequestInit
+  if (isFormData) {
+    // If multipart form data is used, some PHP/Laravel environments don't parse PUT multipart bodies.
+    // In that case, we can use POST with _method = PUT if direct PUT fails or append _method.
+    if (!payload.has('_method')) {
+      payload.append('_method', 'PUT')
+    }
+    options = {
+      method: 'POST',
+      body: payload,
+    }
+  } else {
+    options = {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }
+  }
+
+  let res = await request<{ message?: string }>(`/admin-member/${id}`, options)
+
+  // If POST method not allowed for formData or PUT needed directly
+  if (!res.ok && res.status === 405 && isFormData) {
+    res = await request<{ message?: string }>(`/admin-member/${id}`, {
+      method: 'PUT',
+      body: payload,
+    })
+  }
+
+  if (res.ok) {
+    return {
+      success: true,
+      message: res.data?.message || 'Admin member updated successfully.',
+    }
+  }
+  return { success: false, message: res.message || 'Failed to update admin member.' }
+}
+
 export async function updateMemberCity(
   id: number | string,
   cities: string[] | string,

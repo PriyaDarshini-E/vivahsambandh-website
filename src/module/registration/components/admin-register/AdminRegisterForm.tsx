@@ -7,20 +7,21 @@
  * validators and shadcn-style UI primitives from the main registration form.
  */
 
-import { useId, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useId, useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Field } from '@/components/ui/field'
 import { Checkbox } from '@/components/ui/checkbox'
 import { OptionPills } from '@/components/ui/option-pills'
+import { FormSelect } from '@/components/ui/form-select'
 import { cn } from 'cn'
-import { createAdminRegister } from '../../api/registration.api'
+import { createAdminRegister, getStates } from '../../api/registration.api'
 import MobileNumberField from '../MobileNumberField'
 import PhotoCropField from '../PhotoCropField'
 import TermsModal from '../TermsModal'
 import OtpVerificationModal from '../OtpVerificationModal'
-import type { AdminRegisterFormData } from '../../types'
+import type { AdminRegisterFormData, StateItem } from '../../types'
 import {
   sanitizeName,
   sanitizeEmail,
@@ -42,6 +43,11 @@ const initialAdminFormState: AdminRegisterFormData = {
   user_address: '',
   user_current_city: '',
   mobile: '',
+  alternate_mobile_no: '',
+  admin_state: '',
+  admin_document_type: '',
+  admin_document: null,
+  admin_document_preview: '',
   face_image: null,
   face_image_preview: '',
   agree_terms: false,
@@ -56,6 +62,7 @@ interface SubmitResult {
 
 export default function AdminRegisterForm() {
   const inputId = useId()
+  const documentInputRef = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState<AdminRegisterFormData>(initialAdminFormState)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,9 +72,32 @@ export default function AdminRegisterForm() {
   const [otpMode, setOtpMode] = useState<'inline' | 'submit'>('submit')
   const [isMobileVerified, setIsMobileVerified] = useState(false)
   const [verifiedMobileNumber, setVerifiedMobileNumber] = useState('')
+  const [states, setStates] = useState<StateItem[]>([])
+  const [statesLoading, setStatesLoading] = useState(false)
 
   const isMobileVerifiedNow =
     isMobileVerified && form.mobile === verifiedMobileNumber
+
+  // Load states dropdown
+  useEffect(() => {
+    let active = true
+    setStatesLoading(true)
+    getStates()
+      .then((list) => {
+        if (!active) return
+        setStates(list)
+      })
+      .catch((err) => {
+        console.error('Failed to load states:', err)
+      })
+      .finally(() => {
+        if (!active) return
+        setStatesLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
 
   const clearFieldError = (key: keyof AdminRegisterFormData) => {
     setFieldErrors((prev) => {
@@ -128,6 +158,44 @@ export default function AdminRegisterForm() {
     setForm((prev) => ({ ...prev, gender: value as AdminRegisterFormData['gender'] }))
   }
 
+  const handleStateChange = (value: string) => {
+    clearFieldError('admin_state')
+    setForm((prev) => ({ ...prev, admin_state: value }))
+  }
+
+  const handleDocumentTypeChange = (value: string) => {
+    clearFieldError('admin_document_type')
+    setForm((prev) => ({ ...prev, admin_document_type: value }))
+  }
+
+  const handleDocumentChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    clearFieldError('admin_document')
+    if (!file) return
+
+    // Revoke previous blob URL if exists before processing the new file
+    if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
+
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/webp',
+      'application/pdf',
+    ]
+    if (!allowedTypes.includes(file.type)) {
+      setForm((prev) => ({ ...prev, admin_document: null, admin_document_preview: '' }))
+      e.target.value = ''
+      return
+    }
+    const previewUrl = URL.createObjectURL(file)
+    setForm((prev) => ({
+      ...prev,
+      admin_document: file,
+      admin_document_preview: previewUrl,
+    }))
+  }
+
   const handleCropComplete = (croppedFile: File, previewUrl: string) => {
     setForm((prev) => ({
       ...prev,
@@ -145,6 +213,7 @@ export default function AdminRegisterForm() {
     setOtpMode('submit')
     setIsMobileVerified(false)
     setVerifiedMobileNumber('')
+    if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
   }
 
   const validateForm = (): FieldErrors => {
@@ -167,6 +236,17 @@ export default function AdminRegisterForm() {
     const mobileResult = validateIndianMobile(form.mobile)
     if (!mobileResult.valid) errors.mobile = mobileResult.error
 
+    if (form.alternate_mobile_no) {
+      const altMobileResult = validateIndianMobile(form.alternate_mobile_no)
+      if (!altMobileResult.valid) errors.alternate_mobile_no = altMobileResult.error
+    }
+
+    if (!form.admin_state) errors.admin_state = 'Please select a state'
+
+    if (!form.admin_document_type) errors.admin_document_type = 'Please select a document type'
+
+    if (!form.admin_document) errors.admin_document = 'Please upload an ID document'
+
     if (!form.face_image) errors.face_image = 'Please upload a face photograph'
 
     if (!form.agree_terms) {
@@ -180,8 +260,10 @@ export default function AdminRegisterForm() {
   const submitRegistration = async () => {
     setIsSubmitting(true)
 
-    // FormData matching the create-admin-register API spec exactly:
-    // name, gender, email, user_address, user_current_city, mobile, face_image
+    // FormData matching the create-admin-register API spec:
+    // name, gender, email, user_address, user_current_city, mobile,
+    // alternate_mobile_no, admin_state, admin_document_type, admin_document,
+    // face_image
     const formData = new FormData()
     formData.append('name', form.name.trim())
     formData.append('gender', form.gender)
@@ -189,6 +271,14 @@ export default function AdminRegisterForm() {
     formData.append('user_address', form.user_address.trim())
     formData.append('user_current_city', form.user_current_city.trim())
     formData.append('mobile', form.mobile)
+    if (form.alternate_mobile_no) {
+      formData.append('alternate_mobile_no', form.alternate_mobile_no)
+    }
+    formData.append('admin_state', form.admin_state)
+    formData.append('admin_document_type', form.admin_document_type)
+    if (form.admin_document) {
+      formData.append('admin_document', form.admin_document)
+    }
     if (form.face_image) {
       formData.append('face_image', form.face_image)
     }
@@ -251,7 +341,7 @@ export default function AdminRegisterForm() {
 
   const inputCls = (key: keyof AdminRegisterFormData) =>
     cn(
-      'w-full rounded-full border px-4 py-2.5 text-sm text-navy-900 transition outline-none focus-visible:ring-2',
+      'h-11 w-full rounded-full border px-4 py-2.5 text-sm text-navy-900 transition outline-none focus-visible:ring-2',
       fieldErrors[key]
         ? 'border-maroon-500 bg-maroon-50/30 focus-visible:border-maroon-600 focus-visible:ring-maroon-500/20'
         : 'border-cream-300 bg-cream-50/70 hover:bg-white focus-visible:border-gold-500 focus-visible:bg-white focus-visible:ring-gold-500/20',
@@ -361,7 +451,7 @@ export default function AdminRegisterForm() {
 
           {/* Gender (radio pill selection) */}
           <div id={`${inputId}-gender`}>
-            <span className="mb-1.5 block text-xs font-bold text-navy-900">
+            <span className="mb-2 block text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
               Gender <span className="text-maroon-600">*</span>
             </span>
             <OptionPills
@@ -370,8 +460,8 @@ export default function AdminRegisterForm() {
               value={form.gender}
               onChange={handleGenderChange}
               options={[
-                { value: 'Male', label: 'Male' },
-                { value: 'Female', label: 'Female' },
+                { value: 'Male', label: 'Mr' },
+                { value: 'Female', label: 'Miss' },
               ]}
               error={Boolean(fieldErrors.gender)}
               ariaLabel="Gender"
@@ -404,6 +494,39 @@ export default function AdminRegisterForm() {
             error={fieldErrors.mobile}
             inputClassName={inputCls('mobile')}
           />
+
+          {/* Alternate Mobile Number */}
+          <Field
+            id={`${inputId}-alternate_mobile_no`}
+            label="Alternate Mobile Number"
+            error={fieldErrors.alternate_mobile_no}
+          >
+            <Input
+              id={`${inputId}-alternate_mobile_no`}
+              type="tel"
+              name="alternate_mobile_no"
+              inputMode="numeric"
+              maxLength={10}
+              value={form.alternate_mobile_no}
+              onChange={(e) => {
+                const sanitized = sanitizeDigits(e.target.value, 10)
+                clearFieldError('alternate_mobile_no')
+                setForm((prev) => ({ ...prev, alternate_mobile_no: sanitized }))
+              }}
+              onPaste={handlePasteCapture(
+                'alternate_mobile_no',
+                (val) => sanitizeDigits(val, 10),
+              )}
+              placeholder="Alternate 10-digit mobile"
+              className={inputCls('alternate_mobile_no')}
+              aria-invalid={Boolean(fieldErrors.alternate_mobile_no)}
+              aria-describedby={
+                fieldErrors.alternate_mobile_no
+                  ? `${inputId}-alternate_mobile_no-error`
+                  : undefined
+              }
+            />
+          </Field>
 
           {/* Email */}
           <Field
@@ -451,6 +574,31 @@ export default function AdminRegisterForm() {
             />
           </Field>
 
+          {/* Admin State */}
+          <Field
+            id={`${inputId}-admin_state`}
+            label="State"
+            required
+            error={fieldErrors.admin_state}
+          >
+            <FormSelect
+              id={`${inputId}-admin_state`}
+              value={form.admin_state}
+              onValueChange={handleStateChange}
+              options={states.map((s) => ({
+                value: s.state_name,
+                label: s.state_name,
+              }))}
+              placeholder="Select State"
+              loading={statesLoading}
+              error={Boolean(fieldErrors.admin_state)}
+              aria-invalid={Boolean(fieldErrors.admin_state)}
+              aria-describedby={
+                fieldErrors.admin_state ? `${inputId}-admin_state-error` : undefined
+              }
+            />
+          </Field>
+
           {/* Address */}
           <div className="sm:col-span-2">
             <Field
@@ -468,7 +616,7 @@ export default function AdminRegisterForm() {
                 onChange={handleInputChange}
                 onPaste={handlePasteCapture('user_address', sanitizeAddress)}
                 placeholder="House / Street / Area"
-                className={cn(inputCls('user_address'), 'rounded-2xl')}
+                className={cn(inputCls('user_address'), 'h-auto rounded-2xl')}
                 aria-invalid={Boolean(fieldErrors.user_address)}
                 aria-describedby={
                   fieldErrors.user_address ? `${inputId}-address-error` : undefined
@@ -477,22 +625,167 @@ export default function AdminRegisterForm() {
             </Field>
           </div>
 
-          {/* Face Photograph — same cropper as the user registration */}
-          <div className="sm:col-span-2">
-            <PhotoCropField
-              id={`${inputId}-face_image`}
-              label="Face Photograph"
-              subtitle="Recent clear face photograph for the admin profile."
-              previewUrl={form.face_image_preview}
-              hasPhoto={Boolean(form.face_image)}
-              onCropComplete={handleCropComplete}
-              error={fieldErrors.face_image}
-              aspect={1}
-              outputSize={600}
-              shape="circle"
-              cropTitle="Crop Face Photograph"
-              frameClassName="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gold-500/50 bg-white shadow-inner"
-            />
+          {/* ID Document Type + ID Document | Face Photograph — one row */}
+          <div className="sm:col-span-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-1 flex flex-col h-full gap-5">
+              {/* Admin Document Type */}
+              <Field
+              id={`${inputId}-admin_document_type`}
+              label="ID Document Type"
+              required
+              error={fieldErrors.admin_document_type}
+            >
+              <FormSelect
+                id={`${inputId}-admin_document_type`}
+                value={form.admin_document_type}
+                onValueChange={handleDocumentTypeChange}
+                options={[
+                  { value: 'Aadhar No', label: 'Aadhar No' },
+                  { value: 'Driving License', label: 'Driving License' },
+                  { value: 'Passport', label: 'Passport' },
+                ]}
+                placeholder="Select document type"
+                error={Boolean(fieldErrors.admin_document_type)}
+                aria-invalid={Boolean(fieldErrors.admin_document_type)}
+                aria-describedby={
+                  fieldErrors.admin_document_type
+                    ? `${inputId}-admin_document_type-error`
+                    : undefined
+                }
+              />
+            </Field>
+
+            {/* Admin Document Upload */}
+            <div className="flex flex-col rounded-2xl border p-5 transition min-h-[14rem] flex-1">
+              <span className="text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
+                ID Document <span className="text-maroon-600" aria-hidden="true">*</span>
+              </span>
+              <p className="mt-1 text-xs leading-relaxed text-ink-500">
+                Upload Aadhar / Driving License / Passport (image or PDF)
+              </p>
+              <div className="mt-4 flex-1 flex flex-col gap-4">
+                <input
+                  ref={documentInputRef}
+                  id={`${inputId}-admin_document`}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,.pdf"
+                  onChange={handleDocumentChange}
+                  onClick={(e) => {
+                    // Reset value so choosing the same file triggers onChange
+                    ;(e.target as HTMLInputElement).value = ''
+                  }}
+                  className="sr-only"
+                  aria-label="ID Document"
+                />
+                {form.admin_document_preview ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative flex items-center justify-center rounded-2xl border border-gold-500/50 bg-gold-50/30 p-2 flex-1 w-full max-w-xs">
+                      {form.admin_document?.type?.startsWith('image/') ? (
+                        <img
+                          src={form.admin_document_preview}
+                          alt="Document preview"
+                          className="max-w-[16rem] max-h-32 object-contain rounded-lg shadow-sm border border-cream-200"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-28 w-32 rounded-lg border-2 border-dashed border-gold-500/50 bg-white/50 p-2">
+                          <svg
+                            className="h-8 w-8 text-gold-500 mb-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          <span className="text-[10px] font-semibold text-navy-900 truncate max-w-[12rem]">
+                            PDF Document
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
+                          setForm((prev) => ({
+                            ...prev,
+                            admin_document: null,
+                            admin_document_preview: '',
+                          }))
+                          clearFieldError('admin_document')
+                        }}
+                        className="absolute top-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-maroon-600 shadow-xs hover:bg-white hover:text-maroon-800"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <span className="text-xs text-ink-500 truncate max-w-[16rem]">
+                      {form.admin_document?.name ?? 'Document selected'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => documentInputRef.current?.click()}
+                      className="text-xs font-semibold text-gold-700 hover:text-navy-900 underline"
+                    >
+                      Change document
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <label
+                      htmlFor={`${inputId}-admin_document`}
+                      className="flex items-center justify-center gap-2 rounded-full border border-dashed border-gold-500/60 bg-white px-6 py-3 font-semibold text-navy-900 hover:border-gold-500 hover:bg-gold-50 transition cursor-pointer"
+                    >
+                      <svg
+                        className="h-4 w-4 text-gold-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                        />
+                      </svg>
+                      <span className="text-sm">Upload Document</span>
+                    </label>
+                  </div>
+                )}
+                {fieldErrors.admin_document && (
+                  <p
+                    role="alert"
+                    className="ml-1 flex items-start gap-1.5 text-xs font-semibold text-maroon-600"
+                  >
+                    {fieldErrors.admin_document}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+            {/* Right column: Face Photograph */}
+            <div className="sm:col-span-1 h-full">
+              <PhotoCropField
+                id={`${inputId}-face_image`}
+                label="Face Photograph"
+                subtitle="Recent clear face photograph for the admin profile."
+                previewUrl={form.face_image_preview}
+                hasPhoto={Boolean(form.face_image)}
+                onCropComplete={handleCropComplete}
+                error={fieldErrors.face_image}
+                aspect={1}
+                outputSize={600}
+                shape="circle"
+                cropTitle="Crop Face Photograph"
+                frameClassName="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gold-500/50 bg-white shadow-inner"
+                className="h-full"
+              />
+            </div>
           </div>
 
           {/* Terms & Conditions */}

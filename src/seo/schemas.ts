@@ -62,7 +62,7 @@ export function organizationSchema(lang: SupportedLang = 'en'): Organization {
       postalCode: '560001',
       addressCountry: 'IN',
     } as PostalAddress,
-    sameAs: [...COMPANY_CONFIG.socials],
+    sameAs: [],
     contactPoint: [
       {
         '@type': 'ContactPoint',
