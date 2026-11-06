@@ -14,6 +14,7 @@ import {
   fetchAdminMembers,
   fetchPendingAdminMembers,
   removeDeviceId,
+  updateAdminMember,
   updateMemberCity,
   updateMemberStatus,
 } from '../services/adminApi'
@@ -175,4 +176,30 @@ export function useRemoveDeviceIdMutation() {
     },
   })
 }
+
+interface UpdateAdminMemberVariables {
+  id: number | string
+  data: Record<string, unknown> | FormData
+  successMessage?: string
+}
+
+export function useUpdateAdminMemberMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, data }: UpdateAdminMemberVariables) =>
+      unwrapAction(await updateAdminMember(id, data)),
+    onSuccess: async (message, variables) => {
+      toast.success(variables.successMessage ?? message)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: superAdminKeys.adminMembers }),
+        queryClient.invalidateQueries({ queryKey: superAdminKeys.pendingAdminMembers }),
+      ])
+    },
+    onError: (error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
 

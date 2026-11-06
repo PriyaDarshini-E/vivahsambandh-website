@@ -85,7 +85,7 @@ export default function Footer() {
               {t("footer.about")}
             </p>
 
-            {/* Social Icons — dynamic from getCompany API with canonical fallbacks */}
+            {/* Social Icons — API-only (getCompany); each icon hides when its link is absent */}
             <div className="mt-6 flex items-center gap-3">
               {socials.facebook && (
                 <a

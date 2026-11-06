@@ -232,12 +232,20 @@ export function toMember(raw: Raw, entries: ImageUrlEntry[] = []): Member {
 /** Normalises a `/getAdminMember` or `/getPendingAdminMember` row. */
 export function toAdminMember(raw: Raw, entries: ImageUrlEntry[] = []): AdminMember {
   const faceImageName = text(raw.face_image)
+  const docName = text(raw.admin_document)
 
   return {
     id: Number(raw.id ?? 0),
     name: text(raw.name) ?? 'Unknown',
     status: adminStatus(raw.status),
     mobile: text(raw.mobile),
+    alternate_mobile_no: text(raw.alternate_mobile_no),
+    admin_state: text(raw.admin_state),
+    admin_document_type: text(raw.admin_document_type),
+    admin_document: docName
+      ? resolveImage(docName, entries, ['Document', 'Admin', 'User']) || docName
+      : null,
+    admin_document_name: docName,
     email: text(raw.email),
     gender: text(raw.gender),
     user_address: text(raw.user_address),

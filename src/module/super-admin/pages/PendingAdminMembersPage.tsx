@@ -9,7 +9,8 @@ import {
   UserCheck,
   RefreshCw,
   Eye,
-  Mail,
+  Edit2,
+  FileText,
   MapPin,
   Phone,
 } from 'lucide-react'
@@ -31,6 +32,7 @@ import {
 import { ProfileAvatar } from '../components/ProfileAvatar'
 import { RowStatusSelect } from '../components/RowStatusSelect'
 import { CityAssignmentModal } from '../components/CityAssignmentModal'
+import { EditAdminModal } from '../components/EditAdminModal'
 import {
   usePendingAdminMembersQuery,
   useUpdateMemberCityMutation,
@@ -38,7 +40,7 @@ import {
 } from '../hook/useAdminMembers'
 import { errorMessage } from '../hook/errors'
 import { DEFAULT_PER_PAGE, useServerSearch } from '../hook/useServerList'
-import type { AdminMemberStatus } from '../types'
+import type { AdminMember, AdminMemberStatus } from '../types'
 
 const DECISION_STATUSES: readonly AdminMemberStatus[] = [
   'Pending',
@@ -78,6 +80,9 @@ export default function PendingAdminMembersPage() {
     adminName: string
     nextStatus: AdminMemberStatus
   } | null>(null)
+
+  // Edit Admin Modal State
+  const [editingAdmin, setEditingAdmin] = useState<AdminMember | null>(null)
 
   const editingCityAdmin = useMemo(
     () => allPendingAdmins.find((a) => a.id === editingCityAdminId) ?? null,
@@ -204,12 +209,13 @@ export default function PendingAdminMembersPage() {
           />
         ) : (
           <PanelTable
-            caption="Admin applications awaiting approval with city allocation and decision actions"
+            caption="Admin applications awaiting approval with verification info, city allocation and decision actions"
             head={
               <>
                 <PanelTableHeadCell>Applicant</PanelTableHeadCell>
-                <PanelTableHeadCell>Contact Details</PanelTableHeadCell>
-                <PanelTableHeadCell>Current Location</PanelTableHeadCell>
+                <PanelTableHeadCell>Alternate Mobile</PanelTableHeadCell>
+                <PanelTableHeadCell>State</PanelTableHeadCell>
+                <PanelTableHeadCell>ID Document Type</PanelTableHeadCell>
                 <PanelTableHeadCell>City Allocation</PanelTableHeadCell>
                 <PanelTableHeadCell>Status</PanelTableHeadCell>
                 <PanelTableHeadCell align="right">Decision Actions</PanelTableHeadCell>
@@ -235,32 +241,35 @@ export default function PendingAdminMembersPage() {
                       />
                       <div>
                         <p className="font-bold text-navy-900">{admin.name}</p>
-                        <p className="text-[0.68rem] text-ink-400">
-                          {admin.gender || 'Administrator'}
+                        <p className="flex items-center gap-1 text-[0.68rem] text-ink-400">
+                          <Phone className="size-2.5 text-ink-400" aria-hidden />
+                          {admin.mobile || '—'}
                         </p>
                       </div>
                     </div>
                   </td>
 
                   <td className="px-4 py-3.5">
-                    <div className="space-y-0.5">
-                      <p className="flex items-center gap-1.5 font-medium text-navy-900">
-                        <Phone className="size-3 text-ink-400" aria-hidden />
-                        {admin.mobile || '—'}
-                      </p>
-                      {admin.email && (
-                        <p className="flex items-center gap-1.5 text-ink-500">
-                          <Mail className="size-3 text-ink-400" aria-hidden />
-                          {admin.email}
-                        </p>
-                      )}
-                    </div>
+                    <span className="font-medium text-navy-900">
+                      {admin.alternate_mobile_no || '—'}
+                    </span>
                   </td>
 
                   <td className="px-4 py-3.5">
                     <span className="font-medium text-ink-700">
-                      {admin.user_current_city || '—'}
+                      {admin.admin_state || admin.user_current_city || '—'}
                     </span>
+                  </td>
+
+                  <td className="px-4 py-3.5">
+                    {admin.admin_document_type ? (
+                      <span className="inline-flex items-center gap-1 rounded-md border border-navy-200 bg-navy-50/70 px-2 py-0.5 text-[0.68rem] font-semibold text-navy-800">
+                        <FileText className="size-3 text-navy-600" aria-hidden />
+                        {admin.admin_document_type}
+                      </span>
+                    ) : (
+                      <span className="text-[0.7rem] text-ink-400 italic">—</span>
+                    )}
                   </td>
 
                   <td className="px-4 py-3.5">
@@ -308,6 +317,18 @@ export default function PendingAdminMembersPage() {
 
                   <td className="px-4 py-3.5">
                     <div className="flex items-center justify-end gap-1.5">
+                      <Button
+                        type="button"
+                        size="icon-xs"
+                        variant="outline"
+                        onClick={() => setEditingAdmin(admin)}
+                        title="Edit applicant"
+                        aria-label="Edit applicant profile"
+                        className="cursor-pointer rounded-full border-gold-300 bg-gold-50/70 text-gold-800 hover:bg-gold-100"
+                      >
+                        <Edit2 className="size-3.5 text-gold-700" aria-hidden />
+                      </Button>
+
                       <Button
                         type="button"
                         size="icon-xs"
@@ -376,6 +397,14 @@ export default function PendingAdminMembersPage() {
           onClose={() => setActionTarget(null)}
         />
       )}
+
+      {/* Edit Admin Modal */}
+      <EditAdminModal
+        isOpen={Boolean(editingAdmin)}
+        admin={editingAdmin}
+        onClose={() => setEditingAdmin(null)}
+        onSuccess={() => void refetch()}
+      />
     </div>
   )
 }

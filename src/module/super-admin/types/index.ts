@@ -100,6 +100,16 @@ export interface AdminMember {
   user_current_city?: string | null
   multiple_city?: string | string[] | null
   register_date?: string | null
+  /** Alternate mobile phone number */
+  alternate_mobile_no?: string | null
+  /** State assigned / resident of the admin */
+  admin_state?: string | null
+  /** Type of verification ID document (e.g. Aadhar No, Driving License, Passport) */
+  admin_document_type?: string | null
+  /** Absolute URL of uploaded ID verification document, or raw path */
+  admin_document?: string | null
+  /** Raw filename of the ID verification document */
+  admin_document_name?: string | null
   /** Absolute URL of the administrator photograph, resolved from the API metadata. */
   face_image?: string | null
   /** Stored file name of the administrator photograph, as returned by the API. */
