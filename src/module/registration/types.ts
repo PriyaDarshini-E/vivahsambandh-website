@@ -30,7 +30,7 @@ export interface ApiResponse<T> {
 }
 
 export interface StateItem {
-  id: number | string
+  id?: number | string
   state_name: string
 }
 

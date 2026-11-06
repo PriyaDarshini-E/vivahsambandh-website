@@ -586,7 +586,7 @@ export default function AdminRegisterForm() {
               value={form.admin_state}
               onValueChange={handleStateChange}
               options={states.map((s) => ({
-                value: String(s.id),
+                value: s.state_name,
                 label: s.state_name,
               }))}
               placeholder="Select State"
