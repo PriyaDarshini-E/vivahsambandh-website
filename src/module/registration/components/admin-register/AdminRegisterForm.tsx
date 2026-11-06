@@ -370,8 +370,8 @@ export default function AdminRegisterForm() {
               value={form.gender}
               onChange={handleGenderChange}
               options={[
-                { value: 'Male', label: 'Male' },
-                { value: 'Female', label: 'Female' },
+                { value: 'Male', label: 'Mr' },
+                { value: 'Female', label: 'Miss' },
               ]}
               error={Boolean(fieldErrors.gender)}
               ariaLabel="Gender"
