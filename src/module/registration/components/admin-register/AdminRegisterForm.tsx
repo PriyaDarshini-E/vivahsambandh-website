@@ -341,7 +341,7 @@ export default function AdminRegisterForm() {
 
   const inputCls = (key: keyof AdminRegisterFormData) =>
     cn(
-      'w-full rounded-full border px-4 py-2.5 text-sm text-navy-900 transition outline-none focus-visible:ring-2',
+      'h-11 w-full rounded-full border px-4 py-2.5 text-sm text-navy-900 transition outline-none focus-visible:ring-2',
       fieldErrors[key]
         ? 'border-maroon-500 bg-maroon-50/30 focus-visible:border-maroon-600 focus-visible:ring-maroon-500/20'
         : 'border-cream-300 bg-cream-50/70 hover:bg-white focus-visible:border-gold-500 focus-visible:bg-white focus-visible:ring-gold-500/20',
@@ -451,7 +451,7 @@ export default function AdminRegisterForm() {
 
           {/* Gender (radio pill selection) */}
           <div id={`${inputId}-gender`}>
-            <span className="mb-1.5 block text-xs font-bold text-navy-900">
+            <span className="mb-2 block text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
               Gender <span className="text-maroon-600">*</span>
             </span>
             <OptionPills
@@ -616,7 +616,7 @@ export default function AdminRegisterForm() {
                 onChange={handleInputChange}
                 onPaste={handlePasteCapture('user_address', sanitizeAddress)}
                 placeholder="House / Street / Area"
-                className={cn(inputCls('user_address'), 'rounded-2xl')}
+                className={cn(inputCls('user_address'), 'h-auto rounded-2xl')}
                 aria-invalid={Boolean(fieldErrors.user_address)}
                 aria-describedby={
                   fieldErrors.user_address ? `${inputId}-address-error` : undefined
