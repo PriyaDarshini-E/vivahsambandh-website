@@ -625,112 +625,167 @@ export default function AdminRegisterForm() {
             </Field>
           </div>
 
-          {/* Admin Document Type */}
-          <Field
-            id={`${inputId}-admin_document_type`}
-            label="ID Document Type"
-            required
-            error={fieldErrors.admin_document_type}
-          >
-            <FormSelect
+          {/* ID Document Type + ID Document | Face Photograph — one row */}
+          <div className="sm:col-span-2 grid grid-cols-1 gap-5 sm:grid-cols-2">
+            <div className="sm:col-span-1 flex flex-col h-full gap-5">
+              {/* Admin Document Type */}
+              <Field
               id={`${inputId}-admin_document_type`}
-              value={form.admin_document_type}
-              onValueChange={handleDocumentTypeChange}
-              options={[
-                { value: 'Aadhar No', label: 'Aadhar No' },
-                { value: 'Driving License', label: 'Driving License' },
-                { value: 'Passport', label: 'Passport' },
-              ]}
-              placeholder="Select document type"
-              error={Boolean(fieldErrors.admin_document_type)}
-              aria-invalid={Boolean(fieldErrors.admin_document_type)}
-              aria-describedby={
-                fieldErrors.admin_document_type
-                  ? `${inputId}-admin_document_type-error`
-                  : undefined
-              }
-            />
-          </Field>
+              label="ID Document Type"
+              required
+              error={fieldErrors.admin_document_type}
+            >
+              <FormSelect
+                id={`${inputId}-admin_document_type`}
+                value={form.admin_document_type}
+                onValueChange={handleDocumentTypeChange}
+                options={[
+                  { value: 'Aadhar No', label: 'Aadhar No' },
+                  { value: 'Driving License', label: 'Driving License' },
+                  { value: 'Passport', label: 'Passport' },
+                ]}
+                placeholder="Select document type"
+                error={Boolean(fieldErrors.admin_document_type)}
+                aria-invalid={Boolean(fieldErrors.admin_document_type)}
+                aria-describedby={
+                  fieldErrors.admin_document_type
+                    ? `${inputId}-admin_document_type-error`
+                    : undefined
+                }
+              />
+            </Field>
 
-          {/* Admin Document Upload */}
-          <div
-            id={`${inputId}-admin_document-group`}
-            className="flex flex-col rounded-2xl border p-5 transition"
-          >
-            <span className="text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
-              ID Document <span className="text-maroon-600" aria-hidden="true">*</span>
-            </span>
-            <p className="mt-1 text-xs leading-relaxed text-ink-500">
-              Upload Aadhar / Driving License / Passport (image or PDF)
-            </p>
-            <div className="mt-4 flex items-center gap-4">
-              {form.admin_document_preview ? (
-                <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-gold-500/50 bg-gold-50/30">
-                  <span className="text-sm text-navy-900 truncate max-w-[20rem]">
-                    {form.admin_document?.name ?? 'Document selected'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
-                      setForm((prev) => ({
-                        ...prev,
-                        admin_document: null,
-                        admin_document_preview: '',
-                      }))
-                      clearFieldError('admin_document')
-                    }}
-                    className="text-xs font-semibold text-maroon-600 hover:text-maroon-800"
+            {/* Admin Document Upload */}
+            <div className="flex flex-col rounded-2xl border p-5 transition min-h-[14rem] flex-1">
+              <span className="text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
+                ID Document <span className="text-maroon-600" aria-hidden="true">*</span>
+              </span>
+              <p className="mt-1 text-xs leading-relaxed text-ink-500">
+                Upload Aadhar / Driving License / Passport (image or PDF)
+              </p>
+              <div className="mt-4 flex-1 flex flex-col gap-4">
+                <input
+                  ref={documentInputRef}
+                  id={`${inputId}-admin_document`}
+                  type="file"
+                  accept=".jpg,.jpeg,.png,.webp,.pdf"
+                  onChange={handleDocumentChange}
+                  onClick={(e) => {
+                    // Reset value so choosing the same file triggers onChange
+                    ;(e.target as HTMLInputElement).value = ''
+                  }}
+                  className="sr-only"
+                  aria-label="ID Document"
+                />
+                {form.admin_document_preview ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative flex items-center justify-center rounded-2xl border border-gold-500/50 bg-gold-50/30 p-2 flex-1 w-full max-w-xs">
+                      {form.admin_document?.type?.startsWith('image/') ? (
+                        <img
+                          src={form.admin_document_preview}
+                          alt="Document preview"
+                          className="max-w-[16rem] max-h-32 object-contain rounded-lg shadow-sm border border-cream-200"
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-28 w-32 rounded-lg border-2 border-dashed border-gold-500/50 bg-white/50 p-2">
+                          <svg
+                            className="h-8 w-8 text-gold-500 mb-1"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          <span className="text-[10px] font-semibold text-navy-900 truncate max-w-[12rem]">
+                            PDF Document
+                          </span>
+                        </div>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (form.admin_document) URL.revokeObjectURL(form.admin_document_preview)
+                          setForm((prev) => ({
+                            ...prev,
+                            admin_document: null,
+                            admin_document_preview: '',
+                          }))
+                          clearFieldError('admin_document')
+                        }}
+                        className="absolute top-2 right-2 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-maroon-600 shadow-xs hover:bg-white hover:text-maroon-800"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <span className="text-xs text-ink-500 truncate max-w-[16rem]">
+                      {form.admin_document?.name ?? 'Document selected'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => documentInputRef.current?.click()}
+                      className="text-xs font-semibold text-gold-700 hover:text-navy-900 underline"
+                    >
+                      Change document
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex-1 flex items-center justify-center">
+                    <label
+                      htmlFor={`${inputId}-admin_document`}
+                      className="flex items-center justify-center gap-2 rounded-full border border-dashed border-gold-500/60 bg-white px-6 py-3 font-semibold text-navy-900 hover:border-gold-500 hover:bg-gold-50 transition cursor-pointer"
+                    >
+                      <svg
+                        className="h-4 w-4 text-gold-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                        />
+                      </svg>
+                      <span className="text-sm">Upload Document</span>
+                    </label>
+                  </div>
+                )}
+                {fieldErrors.admin_document && (
+                  <p
+                    role="alert"
+                    className="ml-1 flex items-start gap-1.5 text-xs font-semibold text-maroon-600"
                   >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <input
-                    ref={documentInputRef}
-                    id={`${inputId}-admin_document`}
-                    type="file"
-                    accept=".jpg,.jpeg,.png,.webp,.pdf"
-                    onChange={handleDocumentChange}
-                    className="sr-only"
-                    aria-label="ID Document"
-                  />
-                  <label
-                    htmlFor={`${inputId}-admin_document`}
-                    className="flex items-center justify-center gap-2 rounded-full border border-dashed border-gold-500/60 bg-white px-6 py-3 font-semibold text-navy-900 hover:border-gold-500 hover:bg-gold-50 transition cursor-pointer"
-                  >
-                    <span className="text-sm">Choose file</span>
-                  </label>
-                </>
-              )}
-              {fieldErrors.admin_document && (
-                <p
-                  role="alert"
-                  className="ml-1 flex items-start gap-1.5 text-xs font-semibold text-maroon-600"
-                >
-                  {fieldErrors.admin_document}
-                </p>
-              )}
+                    {fieldErrors.admin_document}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Face Photograph — same cropper as the user registration */}
-          <div className="sm:col-span-2">
-            <PhotoCropField
-              id={`${inputId}-face_image`}
-              label="Face Photograph"
-              subtitle="Recent clear face photograph for the admin profile."
-              previewUrl={form.face_image_preview}
-              hasPhoto={Boolean(form.face_image)}
-              onCropComplete={handleCropComplete}
-              error={fieldErrors.face_image}
-              aspect={1}
-              outputSize={600}
-              shape="circle"
-              cropTitle="Crop Face Photograph"
-              frameClassName="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gold-500/50 bg-white shadow-inner"
-            />
+            {/* Right column: Face Photograph */}
+            <div className="sm:col-span-1 h-full">
+              <PhotoCropField
+                id={`${inputId}-face_image`}
+                label="Face Photograph"
+                subtitle="Recent clear face photograph for the admin profile."
+                previewUrl={form.face_image_preview}
+                hasPhoto={Boolean(form.face_image)}
+                onCropComplete={handleCropComplete}
+                error={fieldErrors.face_image}
+                aspect={1}
+                outputSize={600}
+                shape="circle"
+                cropTitle="Crop Face Photograph"
+                frameClassName="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-gold-500/50 bg-white shadow-inner"
+                className="h-full"
+              />
+            </div>
           </div>
 
           {/* Terms & Conditions */}

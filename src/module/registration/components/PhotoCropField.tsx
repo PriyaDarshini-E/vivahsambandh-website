@@ -39,6 +39,8 @@ export interface PhotoCropFieldProps {
   cropTitle?: string
   /** Frame size classes — defaults suit the face-photo frame. */
   frameClassName?: string
+  /** Optional root container classes */
+  className?: string
 }
 
 export default function PhotoCropField({
@@ -55,6 +57,7 @@ export default function PhotoCropField({
   shape = 'square',
   cropTitle,
   frameClassName,
+  className,
 }: PhotoCropFieldProps) {
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -128,6 +131,7 @@ export default function PhotoCropField({
       className={cn(
         'flex flex-col rounded-2xl border p-5 transition',
         error ? 'border-maroon-500 bg-maroon-50/20' : 'border-cream-300 bg-cream-50/70',
+        className,
       )}
     >
       <span className="text-[13px] font-semibold leading-tight tracking-tight text-navy-900">
