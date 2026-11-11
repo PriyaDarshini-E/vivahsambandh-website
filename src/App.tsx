@@ -26,6 +26,7 @@ const BlogsPage = lazy(() => import('./module/blog/pages/BlogsPage'))
 const BlogDetailPage = lazy(() => import('./module/blog/pages/BlogDetailPage'))
 const ContactPage = lazy(() => import('./module/contact/pages/ContactPage'))
 const PrivacyPage = lazy(() => import('./module/legal/pages/PrivacyPage'))
+const ChildSafetyPage = lazy(() => import('./module/legal/pages/ChildSafetyPage'))
 const TermsPage = lazy(() => import('./module/legal/pages/TermsPage'))
 const GuidelinesPage = lazy(() => import('./module/legal/pages/GuidelinesPage'))
 const HelpCenterPage = lazy(() => import('./module/legal/pages/HelpCenterPage'))
@@ -635,6 +636,14 @@ export default function App() {
                     <Route
                       path="/hi/privacy"
                       element={<PrivacyPage />}
+                    />
+                    <Route
+                      path="/child-safety"
+                      element={<ChildSafetyPage />}
+                    />
+                    <Route
+                      path="/hi/child-safety"
+                      element={<ChildSafetyPage />}
                     />
                     <Route
                       path="/terms"

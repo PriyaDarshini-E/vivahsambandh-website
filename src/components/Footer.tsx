@@ -24,6 +24,7 @@ export default function Footer() {
   const support = [
     { label: t("footer.privacy"), href: pagePath("/privacy", appLang) },
     { label: t("footer.terms"), href: pagePath("/terms", appLang) },
+    { label: t("footer.childSafety", "Child Safety"), href: pagePath("/child-safety", appLang) },
     { label: t("footer.adminRegister"), href: pagePath("/admin-register", appLang) },
   ];
 
