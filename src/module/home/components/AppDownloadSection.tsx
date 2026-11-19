@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { COMPANY } from "../../../constants/company";
+import { useCompanyDetails } from "../../company";
 import type { AppFeature } from "../types";
 import Reveal, { RevealGroup } from "../../../components/motion/Reveal";
 import { img, imgSrcSet } from "../../../lib/image";
@@ -97,6 +98,7 @@ function AppFeatureIcon({ index }: { index: number }) {
 
 export default function AppDownloadSection() {
   const { t } = useTranslation();
+  const company = useCompanyDetails();
   const rawFeatures =
     (t("app.features", { returnObjects: true }) as AppFeature[]) || [];
 
@@ -122,7 +124,7 @@ export default function AppDownloadSection() {
             {/* Store Download Buttons */}
             <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
               <a
-                href={COMPANY.apps.playStore}
+                href={company.apps.playStore}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Google Play"
@@ -149,7 +151,7 @@ export default function AppDownloadSection() {
               </a>
 
               <a
-                href={COMPANY.apps.appStore}
+                href={company.apps.appStore}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="App Store"
