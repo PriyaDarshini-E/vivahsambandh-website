@@ -21,6 +21,12 @@ export const URGENT_LOCAL_IMAGES = new Set([
   '/images/home/home_banner_image-1440.webp',
   '/images/home/home_banner_image.webp',
 
+  // Hero banner mobile/tablet art-direction (couple-centred crop, high quality)
+  '/images/home/home_banner_image-mobile-640.webp',
+  '/images/home/home_banner_image-mobile-860.webp',
+  '/images/home/home_banner_image-mobile-1140.webp',
+  '/images/home/home_banner_image-mobile.webp',
+
   // Hero Top/Bottom Garland accents (above-the-fold)
   '/images/home/flower1_image-192.webp',
   '/images/home/flower1_image-320.webp',
