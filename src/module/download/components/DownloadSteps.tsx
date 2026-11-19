@@ -18,7 +18,7 @@ export default function DownloadSteps() {
             <span>✦</span>
             <span>{t('downloadPage.stepsEyebrow')}</span>
           </div>
-          <h2 className="font-display mt-3 text-2xl font-bold text-navy-900 sm:text-3xl lg:text-4xl">
+          <h2 className="font-display mt-3 text-xl font-bold text-navy-900 sm:text-3xl lg:text-4xl">
             {t('downloadPage.stepsTitle')}
           </h2>
           <p className="mt-3 text-sm text-ink-600 sm:text-base">

@@ -82,7 +82,7 @@ export default function DownloadFeatures() {
         <div className="mx-auto max-w-2xl text-center">
           <div className="inline-flex items-center gap-2 rounded-full border border-gold-500/30 bg-gold-500/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em] text-gold-800">
             <span>✦</span>
-            <span>{t('downloadPage.featuresEyebrow')}</span>
+            <span className='text-[10px] sm:text-base'>{t('downloadPage.featuresEyebrow')}</span>
           </div>
           <h2 className="font-display mt-3 text-2xl font-bold text-navy-900 sm:text-3xl lg:text-4xl  md:text-nowrap">
             {t('downloadPage.featuresTitle')}

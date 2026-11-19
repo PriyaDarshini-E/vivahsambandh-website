@@ -21,14 +21,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin >
     <link rel="preconnect" href="https://vivahsambandh.com" crossorigin >
     <!-- LCP banner: preload with responsive candidates so the hero paints fast.
-         1440w added: desktop (1350px viewport) was jumping from 1280w to 2172w (110KB).
-         Now picks 1440w (~70KB) instead. Per perf.md Phase 7 desktop gap fix. -->
+         Tablet/phone preload uses the couple-centred crop at high quality;
+         desktop keeps the wide banner. 1440w avoids the 2172w jump. -->
     <link
       rel="preload"
       as="image"
-      href="/images/home/home_banner_image-640.webp"
-      imagesrcset="/images/home/home_banner_image-640.webp 640w, /images/home/home_banner_image-1024.webp 1024w, /images/home/home_banner_image-1280.webp 1280w, /images/home/home_banner_image.webp 2172w"
-      imagesizes="(max-width: 640px) 240px, (max-width: 1024px) 640px, 100vw"
+      href="/images/home/home_banner_image-mobile-860.webp"
+      imagesrcset="/images/home/home_banner_image-mobile-640.webp 640w, /images/home/home_banner_image-mobile-860.webp 860w, /images/home/home_banner_image-mobile-1140.webp 1140w, /images/home/home_banner_image-mobile.webp 1412w"
+      imagesizes="(max-width: 640px) 560px, 750px"
+      media="(max-width: 1023px)"
+      fetchpriority="high"
+    >
+    <link
+      rel="preload"
+      as="image"
+      href="/images/home/home_banner_image-1280.webp"
+      imagesrcset="/images/home/home_banner_image-640.webp 640w, /images/home/home_banner_image-800.webp 800w, /images/home/home_banner_image-1024.webp 1024w, /images/home/home_banner_image-1280.webp 1280w, /images/home/home_banner_image-1440.webp 1440w, /images/home/home_banner_image.webp 2172w"
+      imagesizes="100vw"
+      media="(min-width: 1024px)"
       fetchpriority="high"
     >
     <!-- Google Fonts: async (non-render-blocking) + display=swap, no FOUT-blocking -->

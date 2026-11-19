@@ -173,7 +173,7 @@ export default function WhyChooseSection() {
         className="pointer-events-none absolute inset-y-0 -right-4 scale-105 opacity-65 z-0 h-full w-auto max-w-none rotate-180 select-none hidden lg:block"
       />
 
-      <div className="section-pad relative z-10 !max-w-[1440px] !pl-5 !pr-5 sm:!pl-12 lg:!pl-[72px] lg:!pr-[72px] xl:!pl-[88px] xl:!pr-[88px]">
+      <div className="section-pad relative z-10 !max-w-[1440px] !pl-5 !pr-5 md:px-0 lg:!pl-[72px] lg:!pr-[72px] xl:!pl-[88px] xl:!pr-[88px]">
         <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-8 xl:gap-12">
           {/* ========================================================== */}
           {/* Left Column: Eyebrow, Heading, Subtitle, and Gold CTA Button*/}
@@ -225,7 +225,7 @@ export default function WhyChooseSection() {
           {/* Right Column: 3-column x 2-row Grid of Feature Cards       */}
           {/* ========================================================== */}
           <div className="lg:col-span-8 xl:col-span-8 min-w-0 z-10">
-            <RevealGroup className="mx-auto grid w-full max-w-[560px] grid-cols-1 gap-3 sm:max-w-[620px] sm:grid-cols-2 sm:gap-3.5 lg:max-w-[680px] lg:grid-cols-3 lg:gap-4">
+            <RevealGroup className="mx-auto grid w-full max-w-[560px] grid-cols-1 gap-3 sm:max-w-none sm:grid-cols-2 sm:gap-3.5 lg:grid-cols-3 lg:gap-4">
               {rawFeatures.map((f, i) => {
                 const words = f.title.split(" ");
                 const allExceptLast = words.slice(0, -1).join(" ");

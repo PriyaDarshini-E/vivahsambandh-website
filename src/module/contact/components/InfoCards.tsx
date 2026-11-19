@@ -67,7 +67,7 @@ export default function InfoCards() {
   return (
     <section aria-label="Contact channels" className="relative bg-cream-50 pb-8 sm:pb-10">
       <div className="section-pad">
-        <RevealGroup className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-3 sm:gap-5" stagger={0.08}>
+        <RevealGroup className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3 sm:gap-5" stagger={0.08}>
           {cards.map((card, i) => (
             <article
               key={card.title}

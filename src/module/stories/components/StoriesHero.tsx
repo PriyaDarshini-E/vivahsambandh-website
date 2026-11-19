@@ -73,20 +73,29 @@ export default function StoriesHero() {
 
         {/* Hero Background banner */}
         <div className="pointer-events-none relative h-64 sm:h-80 overflow-hidden lg:absolute lg:inset-0 lg:h-auto" aria-hidden="true">
-          <img
-            src={img('/images/home/home_banner_image.webp')}
-            srcSet={imgSrcSet('/images/home/home_banner_image-640.webp 640w, /images/home/home_banner_image-1024.webp 1024w, /images/home/home_banner_image-1280.webp 1280w, /images/home/home_banner_image.webp 2172w')}
-            sizes="100vw"
-            width={2172}
-            height={724}
-            alt="Vivah Sambandh Wedding Celebration Stories"
-            title="Vivah Sambandh Wedding Celebration Stories"
-            data-hero="banner"
-            fetchPriority="high"
-            decoding="async"
-            className="h-full w-full object-cover object-[72%_30%] lg:object-[80%_center] will-change-transform opacity-90"
-            loading="eager"
-          />
+          <picture className="block h-full w-full">
+            {/* Tablets/phones: dedicated couple-centred crop — no dead space,
+                higher pixel density than stretching the wide banner. */}
+            <source
+              media="(max-width: 1023px)"
+              srcSet={imgSrcSet('/images/home/home_banner_image-mobile-640.webp 640w, /images/home/home_banner_image-mobile-860.webp 860w, /images/home/home_banner_image-mobile-1140.webp 1140w, /images/home/home_banner_image-mobile.webp 1412w')}
+              sizes="(max-width: 640px) 500px, 630px"
+            />
+            <img
+              src={img('/images/home/home_banner_image-1280.webp')}
+              srcSet={imgSrcSet('/images/home/home_banner_image-640.webp 640w, /images/home/home_banner_image-800.webp 800w, /images/home/home_banner_image-1024.webp 1024w, /images/home/home_banner_image-1280.webp 1280w, /images/home/home_banner_image-1440.webp 1440w, /images/home/home_banner_image.webp 2172w')}
+              sizes="100vw"
+              width={2172}
+              height={724}
+              alt="Vivah Sambandh Wedding Celebration Stories"
+              title="Vivah Sambandh Wedding Celebration Stories"
+              data-hero="banner"
+              fetchPriority="high"
+              decoding="async"
+              className="h-full w-full object-cover object-center sm:object-[50%_22%] lg:object-[80%_center] will-change-transform opacity-90"
+              loading="eager"
+            />
+          </picture>
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-b from-transparent to-cream-50 lg:hidden" aria-hidden="true" />
         </div>
 
