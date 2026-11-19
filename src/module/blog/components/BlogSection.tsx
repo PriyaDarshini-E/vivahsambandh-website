@@ -61,7 +61,7 @@ function BlogRailSkeleton({ tone }: { tone: 'cream' | 'paper' | 'navy' }) {
           <Bar tone={blockTone} className="mx-auto h-3.5 w-3/4 rounded" />
         </div>
 
-        <div className="mt-8 flex gap-5 px-10 sm:mt-10 sm:px-12 lg:gap-6">
+        <div className="mt-8 flex gap-5 px-10 sm:mt-10 sm:px-0 lg:gap-6 xl:px-12">
           {[0, 1, 2].map((index) => (
             <div
               key={index}
@@ -163,7 +163,7 @@ export default function BlogSection({
         {/* Swiper single-row rail (same pattern as CityMatchesSection).
             NOTE: slides intentionally NOT wrapped in GSAP Reveal — Swiper
             runs its own transform loop and a GSAP ancestor causes glitches. */}
-        <div className="group/blogs relative mt-8 sm:mt-10 px-10 sm:px-12">
+        <div className="group/blogs relative mt-8 px-10 sm:mt-10 sm:px-0 xl:px-12">
           <button
             type="button"
             aria-label={`Previous ${variant} blogs`}
