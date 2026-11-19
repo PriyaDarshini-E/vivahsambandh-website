@@ -173,7 +173,7 @@ export default function WhyBuilt() {
                   <span className="font-display block text-base sm:text-lg font-bold leading-snug text-navy-900">
                     {p.title}
                   </span>
-                  <span className="mt-1 block max-w-md text-xs sm:text-sm leading-relaxed text-ink-600">
+                  <span className="mt-1 block sm:max-w-md md:max-w-full text-xs sm:text-sm leading-relaxed text-ink-600">
                     {p.desc}
                   </span>
                 </span>
