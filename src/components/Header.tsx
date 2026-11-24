@@ -109,7 +109,7 @@ export default function Header() {
       ref={headerRef}
       className="fixed inset-x-0 top-0 z-50 border-b border-gold-500/25 bg-cream-50/90 backdrop-blur will-change-transform"
     >
-      <div className="section-pad flex h-16 items-center justify-between gap-4 sm:gap-3">
+      <div className="section-pad flex h-20 items-center justify-between gap-4 sm:gap-3">
         {/* Brand Logo */}
         <Link
           to={brandHref}
@@ -117,8 +117,8 @@ export default function Header() {
           className="flex min-w-0 items-center gap-4 transition hover:opacity-95"
         >
           <span className="flex shrink-0 items-center rounded-lg px-2 py-1.5">
-              <CompanyLogo className="h-8 w-auto sm:h-9" width={154} height={38} />
-            </span>
+            <CompanyLogo className="h-9 w-auto sm:h-12" width={154} height={38} />
+          </span>
           {/* <span className="min-w-0 leading-none">
             <span className="font-display block truncate text-base font-bold text-navy-900 sm:text-xl">
               {company.name}
@@ -131,7 +131,7 @@ export default function Header() {
 
         {/* Desktop Navigation Links */}
         <nav
-          className="hidden items-center gap-3 text-sm font-medium text-navy-900/80 lg:flex xl:gap-5"
+          className="hidden items-center gap-3 text-xm font-medium text-navy-900/80 lg:flex xl:gap-5"
           aria-label="Primary"
         >
           {navItems.map((item) => (
@@ -139,11 +139,10 @@ export default function Header() {
               key={item.key}
               to={item.href}
               title={item.label}
-              className={`transition hover:text-maroon-600 ${
-                item.active
-                  ? "font-bold text-maroon-600 underline decoration-gold-500 decoration-2 underline-offset-8"
-                  : ""
-              }`}
+              className={`transition hover:text-maroon-600 ${item.active
+                ? "font-bold text-maroon-600 underline decoration-gold-500 decoration-2 underline-offset-8"
+                : ""
+                }`}
             >
               {item.label}
             </Link>

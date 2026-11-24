@@ -360,8 +360,10 @@ export default function HeroSection() {
                 className="mt-4 sm:mt-5 flex flex-col items-stretch gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 relative z-20"
               >
                 <a
-                  href="/registration"
-                  title={t("hero.createProfile")}
+                  href="https://play.google.com/store/apps/details?id=com.vs.agsolution"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={t("hero.downloadApp")}
                   className="group relative inline-flex w-full sm:w-auto items-center justify-center gap-2 sm:gap-2.5 overflow-hidden rounded-full bg-navy-900 px-6 py-3 sm:px-7 sm:py-3 text-[13px] sm:text-sm font-semibold text-white shadow-md shadow-navy-950/20 transition-all duration-300 hover:-translate-y-0.5 hover:bg-navy-800 hover:shadow-lg hover:shadow-navy-950/30 active:scale-[0.97]"
                 >
                   {/* Subtle shine sweep on hover */}
@@ -370,7 +372,7 @@ export default function HeroSection() {
                     className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full"
                   />
                   <span className="relative z-10">
-                    {t("hero.createProfile")}
+                    {t("hero.downloadApp")}
                   </span>
                   <span
                     aria-hidden="true"

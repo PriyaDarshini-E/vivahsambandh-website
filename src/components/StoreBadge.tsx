@@ -34,7 +34,9 @@ export default function StoreBadge({ store, className = '' }: StoreBadgeProps) {
   const { t } = useTranslation()
   const company = useCompanyDetails()
   const { captionKey, name, labelKey, image, alt } = STORES[store]
-  const href = store === 'play' ? company.apps.playStore : company.apps.appStore
+  const href = store === 'play'
+    ? (company.apps.playStore || 'https://play.google.com/store/apps/details?id=com.vs.agsolution')
+    : company.apps.appStore
 
   return (
     <a

@@ -124,7 +124,7 @@ export default function AppDownloadSection() {
             {/* Store Download Buttons */}
             <div className="mt-8 flex flex-wrap gap-3 sm:gap-4">
               <a
-                href={company.apps.playStore}
+                href={company.apps.playStore || "https://play.google.com/store/apps/details?id=com.vs.agsolution"}
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Google Play"
